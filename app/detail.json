@@ -1,0 +1,98 @@
+{
+  "schema": {
+    "type": "object",
+    "title": "Comment",    
+    "properties": {
+      "batch_creator":  {
+        "title": "Batch Creator",
+        "type": "string"
+      },
+      "continued_from_rxn":  {
+        "title": "Continued from reaction",
+        "type": "string"
+      },
+      "continued_to_rxn": {
+        "title": "Continued to reaction",
+        "type": "string"
+      },
+      "creation_date": {
+        "title": "Creation date",
+        "type": "string"
+      },
+      "experiment": {
+        "title": "experiment",
+        "type": "string"
+      },
+      "notebook": {
+        "title": "notebook",
+        "type": "string"
+      },
+      "yield": {
+        "title": "yield",
+        "type": "string"
+      },
+      "title": {
+        "title": "title",
+        "type": "string"
+      }
+    },
+    "required": ["notebook","experiment","title"]
+  },
+  "form": [
+    {
+      "type": "help",
+      "helpvalue": "<div class=\"alert alert-info\">Reaction Detail</div>"
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["title"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["yield"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["batch_creator"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["creation_date"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["notebook"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["experiment"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["continued_from_rxn"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["continued_to_rxn"]
+        }
+      ]
+    },
+    {
+      "key": "comment",
+      "type": "textarea",
+      "placeholder": "Make a comment"
+    }
+  ]
+}
