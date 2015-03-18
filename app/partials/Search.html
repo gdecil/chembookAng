@@ -24,12 +24,43 @@
               </div>          
           </div>
           <div ui-layout-container class=" js-back" >
-              <div > 
+              <div style="width:100%"> 
 
-                <table>
-                  <tr ng-repeat="x in names">
-                    <td>{{ x.Name }}</td>
-                    <td>{{ x.Country }}</td>
+                <table class="table1" style="width:100%">
+                  <tr>
+                    <td>
+                      <div id="grid1">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table id='myGridSearch'></table>
+                      <div id="myGridSearchpager" ></div>
+                      <div id="reaction1">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="table1" id="tabs1">
+                        <tabset>
+                          <tab heading="Reaction">
+                            <div class="table1" style="padding: 10px;">
+                                <iframe onload="" id="ketcherFrame" name="ketcherFrame" style="min-width:800px;min-height:510px;width:100%;border-style:none" src="/chembookAng/js/ketcher/ketcher.html?ketcher_maximize" scrolling="no"></iframe>            
+                            </div>                          
+                          </tab>
+                           <tab heading="Text">
+                            <form name="ngform"
+                                  ng-submit="submitForm(ngform,modelData)"
+                                  id="form1" class="table1" style="padding: 10px;">
+                              <div class="col-md-6" sf-schema="schema" sf-form="form" sf-model="modelData"></div>
+                              <div class="col-md-6" sf-schema="schema" sf-form="formR" sf-model="modelData"></div>
+                            </form>
+                          </tab>
+                        </tabset>
+                      </div>                    
+                    </td>
                   </tr>
                 </table>
 

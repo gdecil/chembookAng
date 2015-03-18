@@ -4,10 +4,10 @@
 
 var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion']);
 
-xControllers.controller('searchCtrl', ['$scope', '$http', function($scope,$http) {        
+xControllers.controller('searchCtrl', ['$scope', '$http', '$window', function($scope,$http, $window) {        
         $scope = treeview($scope,$http)  
-        $scope.names = [ { "Name" : "qui", "City" : "Berlin", "Country" : "Germany" }, { "Name" : "quo", "City" : "Luleå", "Country" : "Sweden" }];        
-
+        $scope = formView($scope,$http)  
+        $scope = tabsSearch($scope, $window)
         $scope = navBarSearch($scope)
      }])
 
@@ -16,26 +16,25 @@ xControllers.controller('viewCtrl',
       '$scope', 
       '$routeParams',
       '$http',
-      function($scope, $param ,$http) {        
-            $scope = treeview($scope,$http)  
-            $scope = formView($scope,$http)  
-            $scope.names = [ { "Name" : "Alfreds Futterkiste", "City" : "Berlin", "Country" : "Germany" }, { "Name" : "Berglunds snabbköp", "City" : "Luleå", "Country" : "Sweden" }];
-             $scope = navBarView($scope)                  
-         }
-    ]
-  );
+      function($scope, $param ,$http) {
+        $scope = formView($scope,$http, $param)  
+        $scope = treeview($scope,$http,$param)  
+        $scope.names = [ { "Name" : "Alfreds Futterkiste", "City" : "Berlin", "Country" : "Germany" }, { "Name" : "Berglunds snabbköp", "City" : "Luleå", "Country" : "Sweden" }];
+         $scope = navBarView($scope,$param)                 
+     }
+    ]);
 
 
 
 xControllers.controller('registerCtrl', ['$scope', '$routeParams', '$http', function($scope, $param ,$http) {        
-        $scope = treeview($scope,$http)  
-        $scope = formView($scope,$http)  
+        $scope = treeview($scope,$http, $param)  
+        $scope = formView($scope,$http, $param)  
         $scope.names = [ { "Name" : "Pippo", "City" : "Berlin", "Country" : "Germany" }, { "Name" : "Pluto", "City" : "Luleå", "Country" : "Sweden" }];
         $scope = navBarRegister($scope)             
 
      }])
 
-var treeview = function($scope,$http){
+var treeview = function($scope,$http,$param){
         /* treeview section*/
   $http.post('http://localhost:8080/Reaction.asmx/GetUsersFullnameAng','{}').
     success(function(data, status, headers, config) {
@@ -124,24 +123,21 @@ var treeview = function($scope,$http){
         if ("page" in $scope.abc.currentNode){
           var page = $scope.abc.currentNode.page;
           var notebook= $scope.abc.currentNode.notebook;
-          exp = new Experiment(notebook,page);
-          $('#form1 #title')[0].value = exp.GeneralDataReaction[0].subject;          
-          $('#form1 #yield')[0].value = exp.GeneralDataReaction[0].yield;          
-          $('#form1 #batch_creator')[0].value = exp.GeneralDataReaction[0].batch_creator;          
-          $('#form1 #creation_date')[0].value = exp.GeneralDataReaction[0].creation_date;          
-          $('#form1 #notebook')[0].value = exp.GeneralDataReaction[0].notebook;          
-          $('#form1 #experiment')[0].value = exp.GeneralDataReaction[0].experiment;          
-          $('#form1 #continued_from_rxn')[0].value = exp.GeneralDataReaction[0].continued_from_rxn;          
-          $('#form1 #continued_to_rxn')[0].value = exp.GeneralDataReaction[0].continued_to_rxn;
-          
-          $('#containerReaction').html("");
-          
+          if (window.location.hash.indexOf("search") >= 0){
+            window.open(window.location.origin +"/chembookAng/app/index.html#/view/" + notebook + "-" + page);
+          }
+          else{
+            $scope.$root.$broadcast("openExperiment", {                                      
+                value: notebook + "-" + page
+            });
+//            getExperiment(notebook,page);
+          }
+/*
           var src = server + '/render?idReaction=' + exp.GeneralDataReaction[0].rxn_scheme_key ;
           var img_height = $('#containerReaction').parent().height();
           var img_width = $('#containerReaction').parent().width();
           $('#containerReaction').append("<img id='moleculeB' src=" + src + " style='width: " + img_width + "px; height: " + img_height + "px;'/>");
-          $('#containerReaction').show();
-          $('#ketcherFrame').hide();
+*/
           }
         else{
           var notebook = $scope.abc.currentNode.label;
@@ -198,19 +194,46 @@ var navBarSearch = function($scope){
                 {
                   title : "View",
                   action : "item.two"
-                },
-                {
-                  divider: true
-                },
-                {
-                  title : "Search Three",
-                  action : "item.three"
                 }
               ]
             },
             {
-              title : "Singular Search Item",
-              action : "singular"
+              title : "Search Reaction",
+              menu : [
+                {
+                  title : "SSS",
+                  action : "item.sss"
+                },
+                {
+                  title : "Exact",
+                  action : "item.exact"
+                }
+              ]
+            },
+            {
+              title : "Search Text",
+              menu : [
+                {
+                  title : "AND",
+                  action : "item.and"
+                },
+                {
+                  title : "OR",
+                  action : "item.or"
+                }
+              ]
+            },
+            {
+              title : "Clear",
+              action : "clear"
+            },
+            {
+              title : "View Selected",
+              action : "viewsel"
+            },
+            {
+              title : "Update selected",
+              action : "updatesel"
             }
           ]; // end menus
 
@@ -233,8 +256,21 @@ var navBarSearch = function($scope){
               case 'item.three':
                 $scope.item = 'Item three selected.';
                 break;
-              case 'singular':
-                $scope.item = 'Singular link item selected.';
+              case 'item.sss':
+                  var ketcher = getKetcher();
+                  searchSSS(ketcher);
+                break;
+              case 'item.exact':
+                break;
+              case 'item.and':
+                break;
+              case 'item.or':
+                break;
+              case 'clear':
+                break;
+              case 'viewsel':
+                break;
+              case 'updatesel':
                 break;
               default:
                 $scope.item = 'Default selection.';
@@ -278,6 +314,8 @@ var navBarSearch = function($scope){
                 break;
             };
           }; // end toggleAffixed
+  
+  return $scope
 }
 
 var navBarRegister = function($scope){
@@ -363,10 +401,10 @@ var navBarRegister = function($scope){
                 break;
             }; // end switch
           }; // end navfn
-
+return $scope
 }
 
-var navBarView = function($scope){
+var navBarView = function($scope, $param){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
@@ -421,17 +459,17 @@ var navBarView = function($scope){
               case 'item.three':
                 break;
               case 'UpdateReaction':
-                alert("Work in progress");
+                window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + $param.experiment)
                 break;
               default:
                 $scope.item = 'Default selection.';
                 break;
             }; // end switch
           }; // end navfn
-
+return $scope
 }
                                                           
-var formView = function($scope,$http){
+var formView = function($scope,$http,$param){
 
   $scope.tests = [
     { name: "Simple", data: 'detail.json' }
@@ -444,9 +482,18 @@ var formView = function($scope,$http){
       $http.get(val.data).then(function(res){
         $scope.schema = res.data.schema;
         $scope.form   = res.data.form;
+        $scope.formR   = res.data.formR;
         $scope.schemaJson = JSON.stringify($scope.schema,undefined,2);
         $scope.formJson   = JSON.stringify($scope.form,undefined,2);
         $scope.modelData = res.data.model || {};
+        if($param.experiment.length >1){
+          var tmp = $param.experiment.split("-");
+          $scope.modelData = getExperiment(tmp[0],tmp[1], $scope.modelData);
+        }            
+/*
+        $scope.modelData.batch_creator = "Leeroy Jenkinsdddd";
+        $scope.modelData.yield = "10";
+*/
       });
     }
   });
@@ -460,6 +507,11 @@ var formView = function($scope,$http){
       if($scope.ngform!= undefined){
         $scope.submitForm($scope.ngform);
       }
+  });
+  
+  $scope.$on("openExperiment", function (event, args) {
+          var tmp = args.value.split("-");
+          $scope.modelData = getExperiment(tmp[0],tmp[1], $scope.modelData);
   });
   
   $scope.$watch('schemaJson',function(val,old){
@@ -510,4 +562,18 @@ var formView = function($scope,$http){
   }
   
   return $scope
-}                                                          
+}     
+
+var tabsSearch = function($scope, $window){
+  $scope.tabs = [
+    { title:'Dynamic Title 1', content:'Dynamic content 1' },
+    { title:'Dynamic Title 2', content:'Dynamic content 2', disabled: true }
+  ];
+
+  $scope.alertMe = function() {
+    setTimeout(function() {
+      $window.alert('You\'ve selected the alert tab!');
+    });
+  };
+  return $scope
+}

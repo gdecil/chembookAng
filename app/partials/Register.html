@@ -28,11 +28,10 @@
               <tr>
                 <td>
                   <form name="ngform"
-                        sf-model="modelData"
-                        sf-form="form"
-                        sf-schema="schema"
                         ng-submit="submitForm(ngform,modelData)"
-                        id="form1"
+                        id="form1">
+                    <div class="col-md-6" sf-schema="schema" sf-form="form" sf-model="modelData"></div>
+                    <div class="col-md-6" sf-schema="schema" sf-form="formR" sf-model="modelData"></div>
                   </form>
                 </td>
               </tr>

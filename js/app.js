@@ -36,7 +36,8 @@ var xApp = angular.module(
     'xDirectives',
     'xRuns',
     'schemaForm',
-    'ui.ace'
+    'ui.ace',
+    'ui.bootstrap'
   ]
 );
 
@@ -47,11 +48,11 @@ xApp.config(['$routeProvider',
         templateUrl: 'partials/Search.html',
         controller: 'searchCtrl'
       }).
-      when('/view/:reactionId', {
+      when('/view/:experiment', {
         templateUrl: 'partials/View.html',
         controller: 'viewCtrl'
       }).
-      when('/register/:reactionId', {
+      when('/register/:experiment', {
         templateUrl: 'partials/Register.html',
         controller: 'registerCtrl'
       }).

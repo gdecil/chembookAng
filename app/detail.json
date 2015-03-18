@@ -20,19 +20,19 @@
         "type": "string"
       },
       "experiment": {
-        "title": "experiment",
+        "title": "Page",
         "type": "string"
       },
       "notebook": {
-        "title": "notebook",
+        "title": "Notebook",
         "type": "string"
       },
       "yield": {
-        "title": "yield",
+        "title": "Yield",
         "type": "string"
       },
       "title": {
-        "title": "title",
+        "title": "Title",
         "type": "string"
       }
     },
@@ -41,7 +41,7 @@
   "form": [
     {
       "type": "help",
-      "helpvalue": "<div class=\"alert alert-info\">Reaction Detail</div>"
+      "helpvalue": "<div class=\"alert alert-info\">Reaction</div>"
     },
     {
       "type": "section",
@@ -60,22 +60,40 @@
         {
           "type": "section",
           "htmlClass": "col-xs-6",
-          "items": ["batch_creator"]
-        },
-        {
-          "type": "section",
-          "htmlClass": "col-xs-6",
-          "items": ["creation_date"]
-        },
-        {
-          "type": "section",
-          "htmlClass": "col-xs-6",
           "items": ["notebook"]
         },
         {
           "type": "section",
           "htmlClass": "col-xs-6",
           "items": ["experiment"]
+        }
+      ]
+    },
+    {
+      "title": "Literature",
+      "key": "comment",
+      "type": "textarea",
+      "placeholder": ""
+    }
+  ],
+  "formR": [
+    {
+      "type": "help",
+      "helpvalue": "<div class=\"alert alert-info\">Detail</div>"
+    },
+    {
+      "type": "section",
+      "htmlClass": "row",
+      "items": [
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["batch_creator"]
+        },
+        {
+          "type": "section",
+          "htmlClass": "col-xs-6",
+          "items": ["creation_date"]
         },
         {
           "type": "section",
@@ -90,9 +108,10 @@
       ]
     },
     {
+      "title": "",
       "key": "comment",
-      "type": "textarea",
-      "placeholder": "Make a comment"
+      "type": "section",
+      "placeholder": ""
     }
   ]
 }

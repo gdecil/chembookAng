@@ -9,6 +9,7 @@
     "angular-ui-layout": null,
     "jquery": null,
     "angular-route": null,
-    "angular-formly": "~4.0.8"
+    "angular-formly": "~4.0.8",
+    "angular-bootstrap": null
   }
 }

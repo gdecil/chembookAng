@@ -1,4 +1,4 @@
-'use strict';
+
 
 /* Directives */
 
@@ -358,3 +358,20 @@ xDirectives.directive('angledNavbar2',function(){
   };
 }) // end navbar
 
+/*xDirectives.directive('formpippo', function() {
+  function link(scope, element, attrs)  {
+    element.html("ciao pippo")
+  }
+})*/
+
+/*xDirectives.directive('formpippo', function($routeParams) {
+  return {
+    link: function (scope, element) {
+      element.html("ciao pippo")
+      if($routeParams.experiment.length >1){
+        var tmp = $routeParams.experiment.split("-");
+        getExperiment(tmp[0],tmp[1]);
+      }    
+    }
+  };
+});*/

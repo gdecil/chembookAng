@@ -1,4 +1,4 @@
-     <div class = "layout" ui-layout  ng-controller="viewCtrl">
+     <div class = "layout" ui-layout  ng-controller="viewCtrl" >
        <div ui-layout-container size="50px" class=" html-back" >
             <div class = "navbarfloat" >
                 <angled-navbar1 affixed='affixed' brand='brand' inverse='inverse' menus='menus' navfn='navfn(action)' search='search' searchfn='searchfn()'></angled-navbar1>
@@ -27,11 +27,10 @@
               <tr>
                 <td>
                   <form name="ngform"
-                        sf-model="modelData"
-                        sf-form="form"
-                        sf-schema="schema"
                         ng-submit="submitForm(ngform,modelData)"
-                        id="form1"
+                        id="form1">
+                    <div class="col-md-6" sf-schema="schema" sf-form="form" sf-model="modelData"></div>
+                    <div class="col-md-6" sf-schema="schema" sf-form="formR" sf-model="modelData"></div>
                   </form>
                 </td>
               </tr>
@@ -40,7 +39,7 @@
                   <div style="height: 750px; width: 100%; margin: 0;">
                       <ang-accordion>
                             <collapsible-item title="Reaction Scheme">
-                              <div id="containerReaction" style="min-width:800px;min-height:510px;width:100%;;border-style:none">
+                              <div formpippo id="containerReaction" style="min-width:800px;min-height:510px;width:100%;;border-style:none">
                                 
                               </div>
 
