@@ -45,7 +45,26 @@ var searchSSS = function (ketcher){
     }
 }
 
-var getExperiment = function(notebook,page, model){
+var getExperiment = function(notebook,page, form){
+  exp = new Experiment(notebook,page);
+  form.input.batch_creator  = exp.GeneralDataReaction[0].batch_creator;  
+  form.input.continued_from_rxn = exp.GeneralDataReaction[0].continued_from_rxn; 
+  form.input.continued_to_rxn = exp.GeneralDataReaction[0].continued_to_rxn;
+  form.input.creation_date = exp.GeneralDataReaction[0].creation_date; 
+  form.input.experiment= exp.GeneralDataReaction[0].experiment;   
+  form.input.notebook= exp.GeneralDataReaction[0].notebook;   
+  form.input.yield = exp.GeneralDataReaction[0].yield;   
+  form.input.title = exp.GeneralDataReaction[0].subject;  
+
+  $('#containerReaction').html("");
+  appendReaction('#containerReaction', exp.GeneralDataReaction[0].rxn_scheme_key) 
+  $('#containerReaction').show();
+  $('#ketcherFrame').hide();
+  
+  return form;
+}
+
+var getExperiment1 = function(notebook,page, model){
   exp = new Experiment(notebook,page);
   model.batch_creator  = exp.GeneralDataReaction[0].batch_creator;  
   model.continued_from_rxn = exp.GeneralDataReaction[0].continued_from_rxn; 
@@ -63,3 +82,18 @@ var getExperiment = function(notebook,page, model){
   
   return model;
 }
+
+var updateExperimentDetail = function(model){
+  exp.GeneralDataReaction[0].batch_creator=model.batch_creator;  
+  exp.GeneralDataReaction[0].continued_from_rxn=model.continued_from_rxn ; 
+  exp.GeneralDataReaction[0].continued_to_rxn=model.continued_to_rxn;
+  exp.GeneralDataReaction[0].creation_date=model.creation_date; 
+  exp.GeneralDataReaction[0].experiment=model.experiment;   
+  exp.GeneralDataReaction[0].notebook=model.notebook;
+  exp.GeneralDataReaction[0].yield=model.yield ;   
+  exp.GeneralDataReaction[0].subject=model.title ;  
+}
+
+var updated = function(modelValue,form){
+  alert("pippo")
+} 

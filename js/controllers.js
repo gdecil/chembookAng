@@ -4,57 +4,134 @@
 
 var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion']);
 
-xControllers.controller('searchCtrl', ['$scope', '$http', '$window', function($scope,$http, $window) {        
-        $scope = treeview($scope,$http)  
-        $scope = formView($scope,$http)  
+xControllers.controller('searchCtrl', ['$scope', '$http', '$window', '$location', function($scope,$http, $window, $location) {        
+        $scope = treeview($scope,$http,null,$location)  
+//        $scope = formView($scope,$http)  
         $scope = tabsSearch($scope, $window)
-        $scope = navBarSearch($scope)
+        $scope = navBarSearch($scope, $location)        
      }])
 
-xControllers.controller('viewCtrl', 
-    [
-      '$scope', 
-      '$routeParams',
-      '$http',
-      function($scope, $param ,$http) {
-        $scope = formView($scope,$http, $param)  
-        $scope = treeview($scope,$http,$param)  
-        $scope.names = [ { "Name" : "Alfreds Futterkiste", "City" : "Berlin", "Country" : "Germany" }, { "Name" : "Berglunds snabbköp", "City" : "Luleå", "Country" : "Sweden" }];
-         $scope = navBarView($scope,$param)                 
-     }
+xControllers.controller('viewCtrl',['$scope','$routeParams','$http','$location', function($scope, $param ,$http, $location) {
+        var form ={input: {}}
+
+        $scope = treeview($scope,$http,$param,$location)  
+        $scope = navBarView($scope,$param, $location)     
+        $scope.$on("openExperiment", function (event, args) {
+          var tmp = args.value.split("-");
+          $scope.form = getExperiment(tmp[0],tmp[1], form);
+        });        
+        
+        $scope.save = function () {
+          // Set the form to pristine state so we're not prompting the user to save
+          // the changes when changing the location.
+
+          $scope.form.ctrl.$setPristine(true);
+          inform.add('Form data saved');
+      //    $location.path('/');
+        };
+
+        $http.get("simple.json").then(function(res){
+          if($param.experiment.length >1){
+            var tmp = $param.experiment.split("-");
+            $scope.form = getExperiment(tmp[0],tmp[1], form);
+          }            
+        });
+
+      }
     ]);
 
+xControllers.controller('registerCtrl', ['$scope', '$routeParams', '$http', '$location','inform', function($scope, $param ,$http, $location, inform) {        
+        $scope = treeview($scope,$http, $param,$location)  
+        $scope = navBarRegister($scope, $location)             
+        var form ={input: {}}
+        $scope.$on("openExperiment", function (event, args) {
+          var tmp = args.value.split("-");
+          $scope.form = getExperiment(tmp[0],tmp[1], form);
+        });        
+        
+        $scope.$on("myEvent", function (event, args) {
+                $scope.form.ctrl.$setPristine(true);
+                inform.add('Form data saved');
+          });
+  
+/*
+        $scope.save = function () {
+            // Set the form to pristine state so we're not prompting the user to save
+            // the changes when changing the location.
 
-
-xControllers.controller('registerCtrl', ['$scope', '$routeParams', '$http', function($scope, $param ,$http) {        
-        $scope = treeview($scope,$http, $param)  
-        $scope = formView($scope,$http, $param)  
-        $scope.names = [ { "Name" : "Pippo", "City" : "Berlin", "Country" : "Germany" }, { "Name" : "Pluto", "City" : "Luleå", "Country" : "Sweden" }];
-        $scope = navBarRegister($scope)             
-
+            $scope.form.ctrl.$setPristine(true);
+            inform.add('Form data saved');
+        //    $location.path('/');
+          };
+*/
+        $scope.form =form
+        $http.get("simple.json").then(function(res){
+          if($param.experiment.length >1){
+            var tmp = $param.experiment.split("-");
+            //$scope.form.input.batch_creator = "pippo"
+            $scope.form = getExperiment(tmp[0],tmp[1], form);
+          }            
+        });
+        //$scope.form.input.batch_creator = "pippo"
      }])
 
-var treeview = function($scope,$http,$param){
+var treeview = function($scope,$http,$param,$location) {
         /* treeview section*/
-  $http.post('http://localhost:8080/Reaction.asmx/GetUsersFullnameAng','{}').
-    success(function(data, status, headers, config) {
-      $scope.treedata = data;
-    }).
-    error(function(data, status, headers, config) {
-      $scope.treedata = 
-              [
-                  { "label" : "De Cillis, Gianpiero", "id" : "role1", "children" : [
-                      { "label" : "00000001", "id" : "role11", "children" : [
-                          { "label" : "0001", "id" : "role111", "children" : []},
-                          { "label" : "0002", "id" : "role112", "children" : []}
-                      ],collapsed:true},
-                      { "label" : "00000002", "id" : "role12", "children" : [
-                          { "label" : "0001", "id" : "role121", "children" : []},
-                          { "label" : "0002", "id" : "role122", "children" : []}
-                      ],collapsed:true}
-                  ],collapsed:true}
-              ];   
-  });
+  var swt
+  if($param == null){
+    swt = 0
+  }
+  else if($param.experiment == "1"){
+    swt = 0
+  }
+  else {
+    swt = 1
+  }
+  if(swt==0){
+    $http.post(server + '/Reaction.asmx/GetUsersFullnameAng','{}').
+      success(function(data, status, headers, config) {
+        $scope.treedata = data;
+      }).
+      error(function(data, status, headers, config) {
+        $scope.treedata = 
+                [
+                    { "label" : "De Cillis, Gianpiero", "id" : "role1", "children" : [
+                        { "label" : "00000001", "id" : "role11", "children" : [
+                            { "label" : "0001", "id" : "role111", "children" : []},
+                            { "label" : "0002", "id" : "role112", "children" : []}
+                        ],collapsed:true},
+                        { "label" : "00000002", "id" : "role12", "children" : [
+                            { "label" : "0001", "id" : "role121", "children" : []},
+                            { "label" : "0002", "id" : "role122", "children" : []}
+                        ],collapsed:true}
+                    ],collapsed:true}
+                ];   
+    });
+  }
+  else {
+    var tmp = $param.experiment.split("-");
+    var tv =server + '/Reaction.asmx/GetExperimentTreeView'
+    var data = '{"notebook":"' + tmp[0] + '", "page":"' + tmp[1] + '","enumVal":"undefined"}'
+    $http.post(tv, data).
+      success(function(data, status, headers, config) {
+        $scope.treedata = data;
+      }).
+      error(function(data, status, headers, config) {
+        $scope.treedata = 
+                [
+                    { "label" : "De Cillis, Gianpiero", "id" : "role1", "children" : [
+                        { "label" : "00000001", "id" : "role11", "children" : [
+                            { "label" : "0001", "id" : "role111", "children" : []},
+                            { "label" : "0002", "id" : "role112", "children" : []}
+                        ],collapsed:true},
+                        { "label" : "00000002", "id" : "role12", "children" : [
+                            { "label" : "0001", "id" : "role121", "children" : []},
+                            { "label" : "0002", "id" : "role122", "children" : []}
+                        ],collapsed:true}
+                    ],collapsed:true}
+                ];   
+    });
+  }
   
   $scope.$watch( 'abc.currentNode', function( newObj, oldObj ) {
           if( $scope.abc && angular.isObject($scope.abc.currentNode) ) {
@@ -77,7 +154,7 @@ var treeview = function($scope,$http,$param){
   $scope.remove = function(scope) {
     scope.remove();
   };
-  $scope.toggle = function(scope) {
+  $scope.toggle = function(scope) {novembre
     scope.toggle();
   };
   $scope.newSubItem = function(scope) {
@@ -111,7 +188,7 @@ var treeview = function($scope,$http,$param){
           $scope.temporaryNode.label= value.title;
           $scope.temporaryNode.notebook = value.title;
           if( $scope.temporaryNode.id && $scope.temporaryNode.label ) {
-              $scope.abc.currentNode.children.push(angular.copy($scope.temporaryNode)) ;
+            $scope.abc.currentNode.children.push(angular.copy($scope.temporaryNode)) ;
           }
         });
       }).
@@ -124,21 +201,18 @@ var treeview = function($scope,$http,$param){
           var page = $scope.abc.currentNode.page;
           var notebook= $scope.abc.currentNode.notebook;
           if (window.location.hash.indexOf("search") >= 0){
+//            $location.path('/view/' + notebook + '-' + page);
             window.open(window.location.origin +"/chembookAng/app/index.html#/view/" + notebook + "-" + page);
           }
           else{
+            $location.path('/view/' + notebook + '-' + page);
+/*
             $scope.$root.$broadcast("openExperiment", {                                      
                 value: notebook + "-" + page
             });
-//            getExperiment(notebook,page);
-          }
-/*
-          var src = server + '/render?idReaction=' + exp.GeneralDataReaction[0].rxn_scheme_key ;
-          var img_height = $('#containerReaction').parent().height();
-          var img_width = $('#containerReaction').parent().width();
-          $('#containerReaction').append("<img id='moleculeB' src=" + src + " style='width: " + img_width + "px; height: " + img_height + "px;'/>");
 */
           }
+        }
         else{
           var notebook = $scope.abc.currentNode.label;
           var pages;
@@ -174,7 +248,7 @@ var treeview = function($scope,$http,$param){
   return $scope
 }
 
-var navBarSearch = function($scope){
+var navBarSearch = function($scope, $location){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
@@ -248,10 +322,13 @@ var navBarSearch = function($scope){
           $scope.navfn = function(action){
             switch(action){
               case 'item.one':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/register/1", "_self");
+                $location.path('/register/1');
+//                window.open(window.location.origin +"/chembookAng/app/index.html#/register/1", "_self");
                 break;
               case 'item.two':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/view/1", "_self");
+                $location.path('/view/1');
+                
+                //window.open(window.location.origin +"/chembookAng/app/index.html#/view/1", "_self");
                 break;
               case 'item.three':
                 $scope.item = 'Item three selected.';
@@ -269,8 +346,14 @@ var navBarSearch = function($scope){
               case 'clear':
                 break;
               case 'viewsel':
+                var expV = currentNB + "-" + currentPage
+                //$location.path('/view/' + expV);
+                window.open(window.location.origin +"/chembookAng/app/index.html#/view/" + expV)
                 break;
               case 'updatesel':
+                var expV = currentNB + "-" + currentPage
+//                $location.path('/register/' + expV);
+                window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + expV)
                 break;
               default:
                 $scope.item = 'Default selection.';
@@ -318,7 +401,7 @@ var navBarSearch = function($scope){
   return $scope
 }
 
-var navBarRegister = function($scope){
+var navBarRegister = function($scope, $location){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
@@ -369,14 +452,18 @@ var navBarRegister = function($scope){
           $scope.navfn = function(action){
             switch(action){
               case 'item.one':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/search", "_self");
+                $location.path('/search');
+                
+                //window.open(window.location.origin +"/chembookAng/app/index.html#/search", "_self");
                 break;                $scope.item = 'Item three selected.';
                 var el = document.getElementById('form1');
                 var scopeForm1 = angular.element(el).scope();
                 scopeForm1.submitForm(scopeForm1.ngform,scopeForm1.model);
 
               case 'item.two':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/view/1", "_self");
+                $location.path('/view/1');
+
+                //window.open(window.location.origin +"/chembookAng/app/index.html#/view/1", "_self");
                 break;
               case 'item.three':
                 break;
@@ -404,7 +491,7 @@ var navBarRegister = function($scope){
 return $scope
 }
 
-var navBarView = function($scope, $param){
+var navBarView = function($scope, $param, $location){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
@@ -451,15 +538,20 @@ var navBarView = function($scope, $param){
           $scope.navfn = function(action){
             switch(action){
               case 'item.one':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/search", "_self");
+                $location.path('/search/');
+                
+        //        window.open(window.location.origin +"/chembookAng/app/index.html#/search", "_self");
                 break;
               case 'item.two':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/register/1", "_self");
+                $location.path('/register/1');
+  //              window.open(window.location.origin +"/chembookAng/app/index.html#/register/1", "_self");
                 break;
               case 'item.three':
                 break;
               case 'UpdateReaction':
-                window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + $param.experiment)
+                var expV = $scope.form.input.notebook + "-" + $scope.form.input.experiment
+                $location.path('/register/' + expV);
+//                window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + expV)
                 break;
               default:
                 $scope.item = 'Default selection.';
@@ -501,7 +593,7 @@ var formView = function($scope,$http,$param){
   $scope.decorator = 'bootstrap-decorator';
 
   $scope.itParses     = true;
-  $scope.itParsesForm = true;"regdetail"
+  $scope.itParsesForm = true;
 
   $scope.$on("myEvent", function (event, args) {
       if($scope.ngform!= undefined){
@@ -557,6 +649,7 @@ var formView = function($scope,$http,$param){
     $scope.$broadcast('schemaFormValidate');
     // Then we check if the form is valid
     if (form.$valid) {
+      updateExperimentDetail($scope.modelData);
       alert('You did it!');
     }
   }

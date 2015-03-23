@@ -65,7 +65,8 @@
         {
           "type": "section",
           "htmlClass": "col-xs-6",
-          "items": ["experiment"]
+          "items": ["experiment"],
+          "onChange": "updated(modelValue,form)"
         }
       ]
     },
@@ -73,7 +74,8 @@
       "title": "Literature",
       "key": "comment",
       "type": "textarea",
-      "placeholder": ""
+      "placeholder": "",
+      "onChange": "function(modelValue,form)"
     }
   ],
   "formR": [

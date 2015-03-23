@@ -244,6 +244,8 @@ function cgReactions(gridId, mydata) {
         rowNum: 5,
         viewrecords : true,
         onSelectRow: function(id){ 
+            currentNB = getCellValueSelected(grid, 'notebook')
+            currentPage = getCellValueSelected(grid, 'page')
             appendReaction( $('#reaction1'), id);
          },
         gridview: true // !!! improve the performance

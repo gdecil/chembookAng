@@ -27,11 +27,17 @@ else {
 }
 
 var exp ;
+var currentNB 
+var currentPage 
 
 var xApp = angular.module(
   'xApp', 
   [
     'ngRoute',
+/*
+    'ngAnimate',
+*/
+    'dirtyForm', 'inform', 'ui.bootstrap.dialog', 
     'xControllers',
     'xDirectives',
     'xRuns',
