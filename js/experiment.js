@@ -233,33 +233,29 @@ Experiment.prototype.updateDetail = function () {
     if (!this.checkOwnership()) {
         return;
     }
-    var dataX = '{"detail":' + JSON.stringify(this.GeneralDataReaction)
+    var tt = this.GeneralDataReaction.keyUcase()
+    var dataX = '{"detail":' + JSON.stringify(tt)
     + '}';
-
-    var ret = $.ajax({
-        type: "POST",
-        url: server + "/Reaction.asmx/UpdateDetail",
-        data: dataX,
-        contentType: "application/json; charset=utf-8",
-        processData: false,
-        dataType: "json",
-        async: false
-    }).responseText;
-    var tmp = eval('(' + ret + ')');
-    if (tmp.ExceptionType != undefined) {
-        alert(tmp.Message)
-        return tmp;
-    }
-    else {
-        if (tmp=1) {
-            expCurrent.isDetailChanged = false;
-            alert("Experiment Updated");
-        }
-        else {
-            alert("Error Updating Experiment Detail");
-        }
-        return tmp.d;
-    }
+          
+    var jqxhr = $.ajax({
+          type: "POST",
+          url: server + "/Reaction.asmx/UpdateDetail",
+          data: dataX,
+          contentType: "application/json; charset=utf-8",
+          processData: false,
+          dataType: "json"
+      })
+    .done(function(data, status, headers, config) {
+      if(data=="1"){
+        alert('Form data saved');
+      }
+      else {
+        alert(data);
+      }
+    })
+    .fail(function() {
+      alert('Form data save error');
+    })    
 };
 
 Experiment.prototype.updateProcedura = function () {
@@ -305,7 +301,7 @@ Experiment.prototype.updateSchema = function () {
         return;
     }
     //var dataX = "{'rxn':'" + this.Rxn + "', 'rxnId':'" + this.Rxn_scheme_key + "'}";
-    var dataX = '{"rxn":' + this.Rxn + ', "notebook":"' + this.notebook + '", "page":"' + this.page + '", "enumVal":"' + this.enumVal + '"}';
+    var dataX = '{"rxn":"' + this.Rxn + '", "notebook":"' + this.notebook + '", "page":"' + this.page + '", "enumVal":"' + this.enumVal + '"}';
 
     var ret = $.ajax({
         type: "POST",
@@ -324,7 +320,7 @@ Experiment.prototype.updateSchema = function () {
     else {
         if (tmp.ret.length == 40) {
             this.isSchemeChanged = false;
-            alert("Scheme updated");
+            alert("Schema updated");
         }
         else {
             alert("Error updating Scheme");
@@ -622,8 +618,6 @@ Experiment.prototype.insertExperiment = function () {
         return tmp.d;
     }
 };
-//Experiment.prototype.getProducts = function () { };
-//Experiment.prototype.getProducts = function () { };
 
 Experiment.prototype.insertDetail = function () {
     if (insertCheck) {
@@ -795,6 +789,7 @@ function ExpGen() {
     this.BATCH_OWNER;
     this.LITERATURE_REF;
     this.OWNER_USERNAME;
+    this.YIELD;
 }
 
 ExpGen.prototype.SUBJECT = '';
@@ -809,6 +804,7 @@ ExpGen.prototype.CONTINUED_TO_RXN = '';
 ExpGen.prototype.PROJECT_ALIAS = '';
 ExpGen.prototype.BATCH_OWNER = '';
 ExpGen.prototype.LITERATURE_REF = '';
+ExpGen.prototype.YIELD = 0;
 
 
 function ExpBatch() {

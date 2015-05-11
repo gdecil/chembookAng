@@ -1,17 +1,24 @@
-'use strict';
 
 /* Controllers */
 
-var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion']);
-
-xControllers.controller('searchCtrl', ['$scope', '$http', '$window', '$location', function($scope,$http, $window, $location) {        
+var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion'])
+.controller('searchCtrl', ['$scope', '$http', '$window', '$location', function($scope,$http, $window, $location) {        
         $scope = treeview($scope,$http,null,$location)  
 //        $scope = formView($scope,$http)  
         $scope = tabsSearch($scope, $window)
         $scope = navBarSearch($scope, $location)        
-     }])
+        $scope.$on("editReactionEvent", function (event, args) {
+//          $('#containerReaction').hide()
+//          $('#ketcherFrame').show();
+          var ketcher = getKetcher();
+          ketcher.setMolecule(exp.Rxn);
+          if($scope.form.ctrl != undefined){
+            $scope.form.ctrl.$dirty= true;
+          }
+        });
 
-xControllers.controller('viewCtrl',['$scope','$routeParams','$http','$location', function($scope, $param ,$http, $location) {
+     }])
+.controller('viewCtrl',['$scope','$routeParams','$http','$location', function($scope, $param ,$http, $location) {
         var form ={input: {}}
 
         $scope = treeview($scope,$http,$param,$location)  
@@ -38,33 +45,65 @@ xControllers.controller('viewCtrl',['$scope','$routeParams','$http','$location',
         });
 
       }
-    ]);
-
-xControllers.controller('registerCtrl', ['$scope', '$routeParams', '$http', '$location','inform', function($scope, $param ,$http, $location, inform) {        
+    ])
+.controller('registerCtrl', ['$scope', '$routeParams', '$http', '$location','inform', function($scope, $param ,$http, $location, inform) {        
         $scope = treeview($scope,$http, $param,$location)  
         $scope = navBarRegister($scope, $location)             
         var form ={input: {}}
+        $scope.form =form
         $scope.$on("openExperiment", function (event, args) {
           var tmp = args.value.split("-");
           $scope.form = getExperiment(tmp[0],tmp[1], form);
         });        
-        
-        $scope.$on("myEvent", function (event, args) {
-                $scope.form.ctrl.$setPristine(true);
-                inform.add('Form data saved');
-          });
-  
-/*
-        $scope.save = function () {
-            // Set the form to pristine state so we're not prompting the user to save
-            // the changes when changing the location.
+        $scope.$watch('form.input', 
+        function() { 
+          if(exp != undefined){
+            exp.GeneralDataReaction[0].subject = form.input.title
+            exp.GeneralDataReaction[0].yield= (form.input.yield==null) ? "0" :form.input.yield 
+            //exp.PROJECT_CODE= form.input.
+            exp.GeneralDataReaction[0].batch_creator= form.input.batch_creator
+            exp.GeneralDataReaction[0].notebook= form.input.notebook
+            exp.GeneralDataReaction[0].experiment= form.input.experiment
+            exp.GeneralDataReaction[0].creation_date= form.input.creation_date
+            exp.GeneralDataReaction[0].continued_from_rxn= (form.input.continued_from_rxn==null) ? "" :form.input.continued_from_rxn  
+            exp.GeneralDataReaction[0].continued_to_rxn= (form.input.continued_to_rxn==null) ? "" :form.input.continued_to_rxn  
+            exp.GeneralDataReaction[0].project_code = ""
+            exp.GeneralDataReaction[0].project_alias = ""
+            exp.GeneralDataReaction[0].synth_route_ref=""
+            exp.GeneralDataReaction[0].literature_ref = ""
+            exp.GeneralDataReaction[0].issuccessful = ""
+  //          exp.PROJECT_ALIAS= form.input.
+  //          exp.BATCH_OWNER= form.input.
+  //          exp.LITERATURE_REF= form.input.
+  //          exp.OWNER_USERNAME= form.input.
+          }
+        }, true);
+                                             
+        $scope.$on("editReactionEvent", function (event, args) {
+          $('#containerReaction').hide()
+          $('#ketcherFrame').show();
+          var ketcher = getKetcher();
+          ketcher.setMolecule(exp.Rxn);
+          if($scope.form.ctrl != undefined){
+            $scope.form.ctrl.$dirty= true;
+          }
+        });
 
-            $scope.form.ctrl.$setPristine(true);
-            inform.add('Form data saved');
-        //    $location.path('/');
-          };
-*/
-        $scope.form =form
+        $scope.$on("regDetailEvent", function (event, args) {
+          
+          exp.updateDetail();
+          if($scope.form.ctrl != undefined){$scope.form.ctrl.$setPristine(true);}
+//          inform.add('Form data saved');
+        });
+        $scope.$on("regSchemalEvent", function (event, args) {
+          var ketcher = getKetcher();
+          exp.Rxn = ketcher.getMolfile();
+
+          exp.updateSchema();
+          if($scope.form.ctrl != undefined){$scope.form.ctrl.$setPristine(true);}
+//          inform.add('Form data saved');
+        });
+  
         $http.get("simple.json").then(function(res){
           if($param.experiment.length >1){
             var tmp = $param.experiment.split("-");
@@ -200,9 +239,11 @@ var treeview = function($scope,$http,$param,$location) {
         if ("page" in $scope.abc.currentNode){
           var page = $scope.abc.currentNode.page;
           var notebook= $scope.abc.currentNode.notebook;
+                   
           if (window.location.hash.indexOf("search") >= 0){
-//            $location.path('/view/' + notebook + '-' + page);
-            window.open(window.location.origin +"/chembookAng/app/index.html#/view/" + notebook + "-" + page);
+            currentNB =""
+            currentPage="" 
+            var rxnIDs = getReactions(notebook + "-" + page ,"text", $('#containerReaction'),"#myGridSearch") 
           }
           else{
             $location.path('/view/' + notebook + '-' + page);
@@ -272,17 +313,21 @@ var navBarSearch = function($scope, $location){
               ]
             },
             {
-              title : "Search Reaction",
+              title : "Reaction",
               menu : [
                 {
-                  title : "SSS",
+                  title : "Search SSS",
                   action : "item.sss"
                 },
                 {
-                  title : "Exact",
+                  title : "Search Exact",
                   action : "item.exact"
                 }
               ]
+            },
+            {
+              title : "Search Mol Online",
+              action : "searchOnline"
             },
             {
               title : "Search Text",
@@ -302,12 +347,21 @@ var navBarSearch = function($scope, $location){
               action : "clear"
             },
             {
-              title : "View Selected",
-              action : "viewsel"
-            },
-            {
-              title : "Update selected",
-              action : "updatesel"
+              title : "Selected",
+              menu : [
+                {
+                  title : "Edit",
+                  action : "editReaction"
+                },
+                {
+                  title : "View",
+                  action : "viewsel"
+                },
+                {
+                  title : "Update",
+                  action : "updatesel"
+                }
+              ]
             }
           ]; // end menus
 
@@ -316,7 +370,7 @@ var navBarSearch = function($scope, $location){
           $scope.searchDisplay = 'Visible';true
 
           $scope.searchfn = function(){
-            alert('Attempting search on: "' + $scope.search.terms + '"');
+            var rxnIDs = getReactions($scope.search.terms ,"fulltext", $('#containerReaction'),"#myGridSearch") 
           }; // searchfn
 
           $scope.navfn = function(action){
@@ -345,15 +399,37 @@ var navBarSearch = function($scope, $location){
                 break;
               case 'clear':
                 break;
+              case 'searchOnline':
+                  var ketcher = getKetcher();
+                  searchOnline(ketcher);
+                break;
               case 'viewsel':
                 var expV = currentNB + "-" + currentPage
+                if (expV=="-"){
+                  alert("Please select a grid row")
+                  return
+                }
                 //$location.path('/view/' + expV);
                 window.open(window.location.origin +"/chembookAng/app/index.html#/view/" + expV)
                 break;
               case 'updatesel':
                 var expV = currentNB + "-" + currentPage
+                if (expV=="-"){
+                  alert("Please select a grid row")
+                  return
+                }
 //                $location.path('/register/' + expV);
                 window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + expV)
+                break;
+              case 'editReaction':
+                var expV = currentNB + "-" + currentPage
+                if (expV=="-"){
+                  alert("Please select a grid row")
+                  return
+                }
+                $scope.$root.$broadcast("editReactionEvent", {                                      
+                    value: ""
+                });
                 break;
               default:
                 $scope.item = 'Default selection.';
@@ -432,9 +508,26 @@ var navBarRegister = function($scope, $location){
               ]
             },
             {
-              title : "Register Detail",
-              action : "regdetail"
-            },
+              title : "Register",
+              menu : [
+                {
+                  title : "Detail",
+                  action : "regdetail"
+                },
+                {
+                  title : "Reaction",
+                  action : "regSchema"
+                },
+                {
+                  title : "Stoichiometry",
+                  action : "regStoic"
+                },
+                {
+                  title : "Procedure & workup",
+                  action : "regProc"
+                }
+              ]
+            },                            
             {
               title : "Edit Reaction",
               action : "editReaction"
@@ -462,24 +555,21 @@ var navBarRegister = function($scope, $location){
 
               case 'item.two':
                 $location.path('/view/1');
-
-                //window.open(window.location.origin +"/chembookAng/app/index.html#/view/1", "_self");
                 break;
               case 'item.three':
                 break;
               case 'editReaction':
-                $('#containerReaction').hide()
-                $('#ketcherFrame').show();
-                var ketcher = getKetcher();
-                ketcher.setMolecule(exp.Rxn);
+                $scope.$root.$broadcast("editReactionEvent", {                                      
+                    value: ""
+                });
                 break;
               case 'regdetail':
-/*
-                var el = document.getElementById('form1');
-                var scopeForm1 = angular.element(el).scope();
-                scopeForm1.submitForm(scopeForm1.ngform,scopeForm1.model);
-*/
-                $scope.$root.$broadcast("myEvent", {                                      
+                $scope.$root.$broadcast("regDetailEvent", {                                      
+                    value: ""
+                });
+                break;
+              case 'regSchema':
+                $scope.$root.$broadcast("regSchemalEvent", {                                      
                     value: ""
                 });
                 break;
@@ -561,6 +651,37 @@ var navBarView = function($scope, $param, $location){
 return $scope
 }
                                                           
+var tabsSearch = function($scope, $window){
+  $scope.tabs = [
+    { title:'Dynamic Title 1', content:'Dynamic content 1' },
+    { title:'Dynamic Title 2', content:'Dynamic content 2', disabled: true }
+  ];
+
+  $scope.alertMe = function() {
+    setTimeout(function() {
+      $window.alert('You\'ve selected the alert tab!');
+    });
+  };
+  return $scope
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var formView = function($scope,$http,$param){
 
   $scope.tests = [
@@ -657,16 +778,3 @@ var formView = function($scope,$http,$param){
   return $scope
 }     
 
-var tabsSearch = function($scope, $window){
-  $scope.tabs = [
-    { title:'Dynamic Title 1', content:'Dynamic content 1' },
-    { title:'Dynamic Title 2', content:'Dynamic content 2', disabled: true }
-  ];
-
-  $scope.alertMe = function() {
-    setTimeout(function() {
-      $window.alert('You\'ve selected the alert tab!');
-    });
-  };
-  return $scope
-}

@@ -1,14 +1,14 @@
-     <div class = "layout" ui-layout  ng-controller="registerCtrl" >
-      <div ui-layout-container size="50px" class=" html-back" >
+     <div class = "layout" ui-layout  >
+      <div id="nord" ui-layout-container size="50px" class=" html-back" >
             <div class = "navbarfloat" >
-                <angled-navbar1 affixed='affixed' brand='brand' inverse='inverse' menus='menus' navfn='navfn(action)' search='search' searchfn='searchfn()'></angled-navbar1>
+                <angled-navbar1 affixed='affixed' brand='brand' inverse='inverse' menus='menus' navfn='navfn(action)' searchfn='searchfn()'></angled-navbar1>
             </div>
 
        </div>
       
-      <div ui-layout-container> 
+      <div id="medium" ui-layout-container> 
         <div ui-layout="{flow : 'column'}" >
-          <div ui-layout-container class=" html-back1" size="200px">
+          <div id ="east" ui-layout-container class=" html-back1" size="200px">
             <ang-accordion>
                   <collapsible-item title="Notebooks">
                   </collapsible-item>
@@ -23,13 +23,10 @@
             </div>          
             
           </div>
-          <div ui-layout-container class=" js-back" >
+          <div id ="center" ui-layout-container class=" js-back" >
             <table width="100%">
               <tr>
                 <td>
-<form class="form-horizontal" name="form.ctrl" novalidate dirty-form>
-
-  </form>
                   <form class="form-horizontal" name="form.ctrl" novalidate dirty-form>
                     <legend>Reaction Detail
                       <span class="pull-right">
@@ -105,14 +102,14 @@
               </tr>
               <tr>
                 <td>
-                  <div style="height: 750px; width: 100%; margin: 0;">
+                  <div style="height: 500px; width: 100%; margin: 0;">
                       <ang-accordion>
                             <collapsible-item title="Reaction Scheme">
-                              <div id="containerReaction" style="min-width:800px;min-height:510px;width:100%;;border-style:none">
+                              <div id="containerReaction" style="min-width:800px;min-height:200px;width:100%;;border-style:none">
                                 
                               </div>
                                 <div>
-                                    <iframe onload="" id="ketcherFrame" name="ketcherFrame" style="min-width:800px;min-height:510px;width:100%;border-style:none" src="/chembookAng/js/ketcher/ketcher.html?ketcher_maximize" scrolling="no"></iframe>            
+                                    <iframe onload="" id="ketcherFrame" name="ketcherFrame" style="min-width:800px;min-height:510px;width:100%;border-style:none" src="js/ketcher/ketcher.html?ketcher_maximize" scrolling="no"></iframe>            
 
                                 </div>
                             </collapsible-item>
@@ -124,9 +121,9 @@
               </tr>
             </table>
           </div>
-          <div ui-layout-container class=" css-back" size="200px"></div>
+          <div id ="west" ui-layout-container class=" css-back" size="200px"></div>
         </div>
       </div>
     
-      <div ui-layout-container size="50px" class=" css-back" ></div>   
+      <div id="sud" ui-layout-container size="50px" class=" css-back" ></div>   
     </div>

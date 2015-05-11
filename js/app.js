@@ -1,3 +1,4 @@
+$.session.set("username", "decilgi0");
 var server = window.location.protocol + "//" + window.location.host;
 var serverWeb = window.location.protocol + "//" + window.location.host;
 
@@ -29,6 +30,8 @@ else {
 var exp ;
 var currentNB 
 var currentPage 
+var currentMolInfo
+currentMolInfo = []
 
 var xApp = angular.module(
   'xApp', 
@@ -51,15 +54,15 @@ xApp.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
       when('/search', {
-        templateUrl: 'partials/Search.html',
+        templateUrl: 'app/partials/Search.html',
         controller: 'searchCtrl'
       }).
       when('/view/:experiment', {
-        templateUrl: 'partials/View.html',
+        templateUrl: 'app/partials/View.html',
         controller: 'viewCtrl'
       }).
       when('/register/:experiment', {
-        templateUrl: 'partials/Register.html',
+        templateUrl: 'app/partials/Register.html',
         controller: 'registerCtrl'
       }).
       otherwise({

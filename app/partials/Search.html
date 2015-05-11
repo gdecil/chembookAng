@@ -1,4 +1,4 @@
-     <div class = "layout" ui-layout  ng-controller="searchCtrl" >
+     <div class = "layout" ui-layout   >
        
       <div ui-layout-container size="50px" class=" html-back" >
             <div class = "navbarfloat" >
@@ -37,7 +37,7 @@
                     <td>
                       <table id='myGridSearch'></table>
                       <div id="myGridSearchpager" ></div>
-                      <div id="reaction1">
+                      <div id="containerReaction" style="min-width:800px;min-height:200px;width:100%;border-style:none">
                       </div>
                     </td>
                   </tr>
@@ -47,7 +47,7 @@
                         <tabset>
                           <tab heading="Reaction">
                             <div class="table1" style="padding: 10px;">
-                                <iframe onload="" id="ketcherFrame" name="ketcherFrame" style="min-width:800px;min-height:510px;width:100%;border-style:none" src="/chembookAng/js/ketcher/ketcher.html?ketcher_maximize" scrolling="no"></iframe>            
+                                <iframe onload="" id="ketcherFrame" name="ketcherFrame" style="min-width:800px;min-height:510px;width:100%;border-style:none" src="js/ketcher/ketcher.html?ketcher_maximize" scrolling="no"></iframe>            
                             </div>                          
                           </tab>
                            <tab heading="Text">
@@ -101,9 +101,16 @@
 
                </div>          
           </div>
-          <div ui-layout-container class=" css-back" size="200px"></div>
+          <div ui-layout-container class=" css-back" size="200px">
+            <div id='containerSmile'>
+                <table id='myGridSearchMol'></table>
+                <div id="myGridSearchMolpager" ></div>
+            </div>
+          </div>
         </div>
       </div>
     
-      <div ui-layout-container size="50px" class=" css-back" ></div>   
+      <div ui-layout-container size="50px" class=" css-back" >
+       
+      </div>   
     </div>

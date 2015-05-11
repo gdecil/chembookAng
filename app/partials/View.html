@@ -1,4 +1,4 @@
-     <div class = "layout" ui-layout  ng-controller="viewCtrl" >
+     <div class = "layout" ui-layout  >
        <div ui-layout-container size="50px" class=" html-back" >
             <div class = "navbarfloat" >
                 <angled-navbar1 affixed='affixed' brand='brand' inverse='inverse' menus='menus' navfn='navfn(action)' search='search' searchfn='searchfn()'></angled-navbar1>
@@ -44,7 +44,6 @@
                           <input type="text" class="form-control" id="inputYield" placeholder="" ng-model="form.input.yield" disabled>
                         </div>
                       </div>
-
                       <div class="fdisabledorm-group col-xs-6 col-sm-3">
                         <label for="inputBatchCreator" class="col-sm-10">Batch Creator</label>
                         <div class="col-sm-10">
@@ -89,7 +88,6 @@
                       </div>
                     </div>
                     </div>
-
                   </form>                    
                 </td>
               </tr>
@@ -98,7 +96,7 @@
                   <div style="height: 750px; width: 100%; margin: 0;">
                       <ang-accordion>
                             <collapsible-item title="Reaction Scheme">
-                              <div formpippo id="containerReaction" style="min-width:800px;min-height:510px;width:100%;;border-style:none" disabled>
+                              <div formpippo id="containerReaction" style="min-width:800px;min-height:200px;width:100%;;border-style:none" disabled>
                                 
                               </div>
 

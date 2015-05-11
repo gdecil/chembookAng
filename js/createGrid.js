@@ -221,6 +221,48 @@ function cgProducts(mydata) {
 
 };
 
+function cgMolecules(gridId, mydata) {
+//  var mydata = 
+//    [
+//      {"name" : "smile", "info" : "hdhdhdh"},
+//      {"name" : "inchi", "info" : "isisisisi"}
+//    ];
+  
+   var grid = $(gridId);
+   grid.jqGrid('GridUnload');
+        
+    jQuery(gridId).jqGrid({
+        datatype: "local",
+        data: mydata,
+        height: 'auto',
+        autowidth: true,
+        colNames: ['Name', 'Info'],
+        colModel: [
+            {name: 'name', index: 'name', width: 20},
+            {name: 'info', index: 'info', width: 100}
+        ],
+        caption: "MolInfo",
+        pager : gridId + 'pager',
+        rowNum: 20,
+        viewrecords : true,
+        onSelectRow: function(id){ 
+            currentName = getCellValueSelected(gridId, 'name')
+            currentInfo = getCellValueSelected(gridId, 'info')
+            if (currentName=="CAS"){
+              getNIST(currentInfo)
+              getTOXNET(currentInfo)
+              get3D(currentInfo)
+              getGusar(currentInfo)
+              getNCI(currentInfo)
+              getChemIdPlus(currentInfo)
+            }
+         },
+        gridview: true // !!! improve the performance
+    });
+        jQuery(gridId).jqGrid('navGrid', gridId + 'pager',{add: false, edit: false, del: false, search: false, view: true});
+
+};
+
 function cgReactions(gridId, mydata) {
    var grid = $(gridId);
    grid.jqGrid('GridUnload');
@@ -240,12 +282,13 @@ function cgReactions(gridId, mydata) {
             {name: 'rxn_scheme_key', index: 'rxn_scheme_key', width: 60, hidden:true, key:true}
         ],
         caption: "RXNID",
-        pager : '#gridpager',
+        pager : gridId + 'pager',
         rowNum: 5,
         viewrecords : true,
         onSelectRow: function(id){ 
-            currentNB = getCellValueSelected(grid, 'notebook')
-            currentPage = getCellValueSelected(grid, 'page')
+            currentNB = getCellValueSelected(gridId, 'notebook')
+            currentPage = getCellValueSelected(gridId, 'page')
+            exp = new Experiment(currentNB,currentPage);
             appendReaction( $('#reaction1'), id);
          },
         gridview: true // !!! improve the performance

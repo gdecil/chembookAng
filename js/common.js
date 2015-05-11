@@ -1,3 +1,12 @@
+var checkUserIsLoggedIn = function () {
+    var username = $.session.get("username");
+    if (username == null || username == undefined || username == "") {
+        alert("You are not logged in: You cannot insert or update data!")
+        return false;
+    };
+    return true;
+}
+
 var getObjects = function (obj, key, val) {
             var objects = [];
             for (var i in obj) {
@@ -30,17 +39,36 @@ var appendReaction = function (containerId, rxnId) {
     if (rxnId==null) {        
         return;
     }
-    var src = server + '/render?idReaction=' + rxnId ;
-    var img_height = $('#containerReaction').parent().height();
-    var img_width = $('#containerReaction').parent().width();
+    d = new Date();
+    var src = server + '/render?idReaction=' + rxnId + '&' +d.getTime() ;
+    img_height=200
+    img_width=800
+
+//    var img_height = $('#reaction1').height();
+//    var img_width = $('#reaction1').width();
+//    if(img_height==null){
+//    }
+    //$(containerId).append("<img id='moleculeB' src=" + src + " />");
     $(containerId).append("<img id='moleculeB' src=" + src + " style='width: " + img_width + "px; height: " + img_height + "px;'/>");
+}
+
+var searchOnline = function (ketcher){
+    currentMolInfo=[]  
+    
+    if (ketcher){
+        var mol =ketcher.getMolfile();
+        if (mol.length > 105) {
+            getSmileFromMol(mol)            
+            getInchiFromMol(mol)
+        }
+    }
 }
 
 var searchSSS = function (ketcher){
     if (ketcher){
         var rxn =ketcher.getMolfile();
         if (rxn.length > 105) {
-            var rxnIDs = getReactions(rxn,"SSS", $('#reaction1'),"#myGridSearch")            
+            var rxnIDs = getReactions(rxn,"SSS", $('#containerReaction'),"#myGridSearch")            
         }
     }
 }
@@ -90,10 +118,30 @@ var updateExperimentDetail = function(model){
   exp.GeneralDataReaction[0].creation_date=model.creation_date; 
   exp.GeneralDataReaction[0].experiment=model.experiment;   
   exp.GeneralDataReaction[0].notebook=model.notebook;
-  exp.GeneralDataReaction[0].yield=model.yield ;   
+  exp.GeneralDataReaction[0].yield= (model.yield==null) ? "0" : model.yield
+//  exp.GeneralDataReaction[0].yield=model.yield ;   
   exp.GeneralDataReaction[0].subject=model.title ;  
 }
 
 var updated = function(modelValue,form){
   alert("pippo")
 } 
+
+
+Array.prototype.keyUcase = function() {
+  for(var i = 0; i<this.length;i++) {
+
+      var a = this[i];
+      for (var key in a) {
+          var temp; 
+          if (a.hasOwnProperty(key)) {
+            temp = a[key];
+            delete a[key];
+            a[key.toUpperCase()] = temp;
+          }
+      }
+      this[i] = a;
+
+  }
+  return this;
+}
