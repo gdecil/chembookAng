@@ -53,11 +53,11 @@ Experiment.prototype.sayHello = function () {
 };
 
 Experiment.prototype.getAttachement = function () {
-    var dataX = "{'notebook':'" + this.notebook + "','page':'" + this.page + "'}";
+    var dataX = '{"notebook":"' + this.notebook + '","page":"' + this.page + '"}';
 
     var ret = $.ajax({
         type: "POST",
-        url: server + "/Reaction.asmx/GetAttachements",
+        url: server + "/Reaction.asmx/GetAttachments",
         data: dataX,
         contentType: "application/json; charset=utf-8",
         processData: false,
@@ -71,7 +71,7 @@ Experiment.prototype.getAttachement = function () {
     }
     else {
 
-        return tmp.d;
+        return tmp;
     }
 };
 

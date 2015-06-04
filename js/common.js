@@ -52,6 +52,24 @@ var appendReaction = function (containerId, rxnId) {
     $(containerId).append("<img id='moleculeB' src=" + src + " style='width: " + img_width + "px; height: " + img_height + "px;'/>");
 }
 
+var appendMolecule = function (containerId, Id) {
+    $(containerId).html("");
+    if (Id==null) {        
+        return;
+    }
+    d = new Date();
+    var src = server + '/render?strid=' + Id + '&' +d.getTime() ;
+    img_height=200
+    img_width=400
+
+//    var img_height = $('#reaction1').height();
+//    var img_width = $('#reaction1').width();
+//    if(img_height==null){
+//    }
+    //$(containerId).append("<img id='moleculeB' src=" + src + " />");
+    $(containerId).append("<img id='moleculeB' src=" + src + " style='width: " + img_width + "px; height: " + img_height + "px;'/>");
+}
+
 var searchOnline = function (ketcher){
     currentMolInfo=[]  
     
@@ -73,6 +91,15 @@ var searchSSS = function (ketcher){
     }
 }
 
+var searchMARSSS = function (ketcher){
+    if (ketcher){
+        var rxn =ketcher.getMolfile();
+        if (rxn.length > 105) {
+            var rxnIDs = getMolecules(rxn,"SSS", $('#containerReaction'),"#myGridSearch")            
+        }
+    }
+}
+
 var getExperiment = function(notebook,page, form){
   exp = new Experiment(notebook,page);
   form.input.batch_creator  = exp.GeneralDataReaction[0].batch_creator;  
@@ -89,6 +116,41 @@ var getExperiment = function(notebook,page, form){
   $('#containerReaction').show();
   $('#ketcherFrame').hide();
   
+    var grid = $("#myReactant");
+    grid.jqGrid('GridUnload');
+    var Mydata = exp.getReagents()
+
+    if (Mydata != null) {
+        var gridR = "#myReactant",
+            pagerR = '#reactantspager',
+            captionR = "Reagents";
+        cgProductsReagentsSave(Mydata, gridR, pagerR, captionR);
+    }
+
+    var grid = $("#myProducts");
+    grid.jqGrid('GridUnload');
+    var Mydata = exp.getProducts()
+    if (Mydata != null) {
+        var gridR = "#myProducts",
+            pagerR = '#Productspager',
+            captionR = "Products";
+        cgProductsReagentsSave(Mydata, gridR, pagerR, captionR);
+    }
+
+/*
+    var grid = $("#myAttach");
+    grid.jqGrid('GridUnload');
+    cgAttach($.parseJSON(expCurrent.getAttachement()));
+*/
+
+    
+  $('#containerProcedure').html(exp.GeneralDataReaction[0].procedure);
+    
+  var grid = $("#myAttach");
+  grid.jqGrid('GridUnload');
+  cgAttach(exp.getAttachement());
+
+
   return form;
 }
 
@@ -127,6 +189,15 @@ var updated = function(modelValue,form){
   alert("pippo")
 } 
 
+var viewAttach = function (att) {
+        $('#txtDocName').val(att.DOCUMENT_NAME).css('width', '400px')
+        $('#txtDocDesc').val(att.DOCUMENT_DESCRIPTION).css('width', '400px')
+        $('#txtDocFile').val(att.ORIGINAL_FILE_NAME).css('width', '600px')
+        var fileName = getAttFileName(att.ATTACHEMENT_KEY)[0].ORIGINAL_FILE_NAME;
+        var tmp = fileName.split("\\");
+        var fn = tmp[tmp.length-1]
+        $('#downFile').html('<a href="attachements/' + fn + '">' + fn + '</a>')
+    }
 
 Array.prototype.keyUcase = function() {
   for(var i = 0; i<this.length;i++) {

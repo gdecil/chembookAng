@@ -248,6 +248,13 @@ function cgMolecules(gridId, mydata) {
         onSelectRow: function(id){ 
             currentName = getCellValueSelected(gridId, 'name')
             currentInfo = getCellValueSelected(gridId, 'info')
+            if (currentName=="inchi"){
+              getChemspider(currentInfo)
+            }
+            if (currentName=="Formula"){
+              var url= serverWeb + "/chembookAng/index.html#/graph/ccn1"
+              window.open(url, '_self');  
+            }
             if (currentName=="CAS"){
               getNIST(currentInfo)
               getTOXNET(currentInfo)
@@ -256,6 +263,42 @@ function cgMolecules(gridId, mydata) {
               getNCI(currentInfo)
               getChemIdPlus(currentInfo)
             }
+         },
+        gridview: true // !!! improve the performance
+    });
+        jQuery(gridId).jqGrid('navGrid', gridId + 'pager',{add: false, edit: false, del: false, search: false, view: true});
+
+};
+
+function cgMoleculesMar(gridId, mydata) {
+   var grid = $(gridId);
+   grid.jqGrid('GridUnload');
+        
+    jQuery(gridId).jqGrid({
+        datatype: "local",
+        data: mydata,
+        height: 'auto',
+        autowidth: true,
+        colNames: ['USERNAME', 'BATCH', 'CORPID', 'SUBMISSION_DATE', 'STRID'],
+        colModel: [
+            {name: 'username', index: 'username', width: 60},
+            {name: 'batch', index: 'batch', width: 60},
+            {name: 'corp_id', index: 'corp_id', width: 60},
+            { name: 'submission_date', index: 'submission_date', width: 60 },
+            {name: 'str_id', index: 'str_id', width: 60, hidden:true, key:true}
+        ],
+        caption: "STRID",
+        pager : gridId + 'pager',
+        rowNum: 5,
+        viewrecords : true,
+        onSelectRow: function(id){ 
+            if(event.ctrlKey)
+            {            
+                batch = getCellValueSelected(gridId, 'batch')
+                getReactions("batch=" + batch ,"", "","") 
+            }
+            currentStrid = id
+            appendMolecule( $('#containerReaction'), id);
          },
         gridview: true // !!! improve the performance
     });
@@ -289,7 +332,7 @@ function cgReactions(gridId, mydata) {
             currentNB = getCellValueSelected(gridId, 'notebook')
             currentPage = getCellValueSelected(gridId, 'page')
             exp = new Experiment(currentNB,currentPage);
-            appendReaction( $('#reaction1'), id);
+            appendReaction( $('#containerReaction'), id);
          },
         gridview: true // !!! improve the performance
     });

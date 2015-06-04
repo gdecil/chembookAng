@@ -1,7 +1,23 @@
 
 /* Controllers */
 
-var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion'])
+var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion', 'highcharts-ng'])
+.controller('graphCtrl', ['$routeParams','$scope', '$http', '$window', '$location', function($param, $scope,$http, $window, $location) {        
+  $scope = treeview($scope,$http,null,$location)  
+//        $scope = formView($scope,$http)  
+  $scope = tabsSearch($scope, $window)
+  $scope = navBarSearch($scope, $location)        
+  $scope.$on("editReactionEvent", function (event, args) {
+//          $('#containerReaction').hide()
+//          $('#ketcherFrame').show();
+    var ketcher = getKetcher();
+    ketcher.setMolecule(exp.Rxn);
+    if($scope.form.ctrl != undefined){
+      $scope.form.ctrl.$dirty= true;
+    }
+  });
+  $scope = graphChart($scope, $param)
+ }])
 .controller('searchCtrl', ['$scope', '$http', '$window', '$location', function($scope,$http, $window, $location) {        
         $scope = treeview($scope,$http,null,$location)  
 //        $scope = formView($scope,$http)  
@@ -10,11 +26,20 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
         $scope.$on("editReactionEvent", function (event, args) {
 //          $('#containerReaction').hide()
 //          $('#ketcherFrame').show();
-          var ketcher = getKetcher();
-          ketcher.setMolecule(exp.Rxn);
-          if($scope.form.ctrl != undefined){
-            $scope.form.ctrl.$dirty= true;
-          }
+            if($('.ui-jqgrid-title')[0].textContent=="STRID"){
+                getMolecule(currentStrid).done(function(molfile) {
+                    var ketcher = getKetcher();
+                    ketcher.setMolecule(molfile);
+                })
+            }
+            else
+            {
+                var ketcher = getKetcher();
+                ketcher.setMolecule(exp.Rxn);
+                if($scope.form.ctrl != undefined){
+                    $scope.form.ctrl.$dirty= true;
+                }
+            }
         });
 
      }])
@@ -24,8 +49,13 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
         $scope = treeview($scope,$http,$param,$location)  
         $scope = navBarView($scope,$param, $location)     
         $scope.$on("openExperiment", function (event, args) {
-          var tmp = args.value.split("-");
-          $scope.form = getExperiment(tmp[0],tmp[1], form);
+            var jqxhr = $.get( "example.php", function() {
+              alert( "success" );
+            })
+              .always(function() {
+                  var tmp = args.value.split("-");
+                  $scope.form = getExperiment(tmp[0],tmp[1], form);
+              });            
         });        
         
         $scope.save = function () {
@@ -36,13 +66,22 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
           inform.add('Form data saved');
       //    $location.path('/');
         };
+    
+        if($param.experiment.length >1){
+            var tmp = $param.experiment.split("-");
+            $scope.$root.$broadcast("openExperiment", {                                      
+                value: tmp[0] + "-" + tmp[1]
+            });
+        }            
 
+/*
         $http.get("simple.json").then(function(res){
           if($param.experiment.length >1){
             var tmp = $param.experiment.split("-");
             $scope.form = getExperiment(tmp[0],tmp[1], form);
           }            
         });
+*/
 
       }
     ])
@@ -52,8 +91,36 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
         var form ={input: {}}
         $scope.form =form
         $scope.$on("openExperiment", function (event, args) {
-          var tmp = args.value.split("-");
-          $scope.form = getExperiment(tmp[0],tmp[1], form);
+            var jqxhr = $.get( "example.php", function() {
+              alert( "success" );
+            })
+              .always(function() {
+                  var tmp = args.value.split("-");
+                  $scope.form = getExperiment(tmp[0],tmp[1], form);
+                  
+                /*CKEDITOR*/
+                    $scope.editorOptions = {
+                        language: 'en'
+                       // uiColor: '#000000'
+                    };
+/*
+                    $scope.$on("ckeditor.ready", function( event ) {
+                        $scope.isReady = true;
+                    });
+*/
+                    $scope.test = exp.GeneralDataReaction[0].procedure;
+                    $scope.save = function() {
+                        $http.post('/examples/test.php', {
+                            content: $scope.test
+                        }).success(function() {
+                            alert('Saved');
+                        });
+                    }
+                    $scope.save = function() {
+                        console.info($scope.test, 'save');
+                    }
+                  $scope.isReady = true;
+              });            
         });        
         $scope.$watch('form.input', 
         function() { 
@@ -103,16 +170,14 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
           if($scope.form.ctrl != undefined){$scope.form.ctrl.$setPristine(true);}
 //          inform.add('Form data saved');
         });
-  
-        $http.get("simple.json").then(function(res){
-          if($param.experiment.length >1){
+        if($param.experiment.length >1){
             var tmp = $param.experiment.split("-");
-            //$scope.form.input.batch_creator = "pippo"
-            $scope.form = getExperiment(tmp[0],tmp[1], form);
-          }            
-        });
-        //$scope.form.input.batch_creator = "pippo"
-     }])
+            $scope.$root.$broadcast("openExperiment", {                                      
+                value: tmp[0] + "-" + tmp[1]
+            });
+        }            
+    
+}])
 
 var treeview = function($scope,$http,$param,$location) {
         /* treeview section*/
@@ -246,12 +311,10 @@ var treeview = function($scope,$http,$param,$location) {
             var rxnIDs = getReactions(notebook + "-" + page ,"text", $('#containerReaction'),"#myGridSearch") 
           }
           else{
-            $location.path('/view/' + notebook + '-' + page);
-/*
+//            $location.path('/view/' + notebook + '-' + page);
             $scope.$root.$broadcast("openExperiment", {                                      
                 value: notebook + "-" + page
             });
-*/
           }
         }
         else{
@@ -313,7 +376,7 @@ var navBarSearch = function($scope, $location){
               ]
             },
             {
-              title : "Reaction",
+              title : "Search Rea",
               menu : [
                 {
                   title : "Search SSS",
@@ -326,9 +389,23 @@ var navBarSearch = function($scope, $location){
               ]
             },
             {
-              title : "Search Mol Online",
-              action : "searchOnline"
+              title : "Search Mol",
+              menu : [
+                {
+                  title : "Online",
+                  action : "searchOnline"
+                },
+                {
+                  title : "MAR SSS",
+                  action : "searchMARSSS"
+                },
+                {
+                  title : "MAR Exact",
+                  action : "searchMARExact"
+                }
+              ]
             },
+/*
             {
               title : "Search Text",
               menu : [
@@ -342,6 +419,7 @@ var navBarSearch = function($scope, $location){
                 }
               ]
             },
+*/
             {
               title : "Clear",
               action : "clear"
@@ -370,19 +448,26 @@ var navBarSearch = function($scope, $location){
           $scope.searchDisplay = 'Visible';true
 
           $scope.searchfn = function(){
-            var rxnIDs = getReactions($scope.search.terms ,"fulltext", $('#containerReaction'),"#myGridSearch") 
+            if($scope.search.terms.toUpperCase().indexOf("R ") >= 0){
+                var ft = $scope.search.terms.substring(2, $scope.search.terms.length)
+                getReactions( ft, "fulltext", $('#containerReaction'),"#myGridSearch") 
+            }
+            else {
+              getMAR($scope.search.terms) 
+            }
+
           }; // searchfn
 
+          var tmp = window.location.pathname.split("/");
           $scope.navfn = function(action){
             switch(action){
               case 'item.one':
-                $location.path('/register/1');
-//                window.open(window.location.origin +"/chembookAng/app/index.html#/register/1", "_self");
+//                $location.path('/register/1');
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/register/1", "_blank");
                 break;
               case 'item.two':
-                $location.path('/view/1');
-                
-                //window.open(window.location.origin +"/chembookAng/app/index.html#/view/1", "_self");
+//                $location.path('/view/1');                
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/view/1", "_blank");
                 break;
               case 'item.three':
                 $scope.item = 'Item three selected.';
@@ -392,16 +477,30 @@ var navBarSearch = function($scope, $location){
                   searchSSS(ketcher);
                 break;
               case 'item.exact':
+                    alert('work in progress')
                 break;
               case 'item.and':
+                    alert('work in progress')
                 break;
               case 'item.or':
+                    alert('work in progress')
                 break;
               case 'clear':
+                    alert('work in progress')
                 break;
               case 'searchOnline':
                   var ketcher = getKetcher();
                   searchOnline(ketcher);
+                break;
+              case 'searchMARSSS':
+                  var ketcher = getKetcher();
+                  searchMARSSS(ketcher);
+                break;
+              case 'searchMARExact':
+                    alert('work in progress')
+                    return
+                  var ketcher = getKetcher();
+                  searchMARSSS(ketcher);
                 break;
               case 'viewsel':
                 var expV = currentNB + "-" + currentPage
@@ -410,7 +509,7 @@ var navBarSearch = function($scope, $location){
                   return
                 }
                 //$location.path('/view/' + expV);
-                window.open(window.location.origin +"/chembookAng/app/index.html#/view/" + expV)
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/view/" + expV)
                 break;
               case 'updatesel':
                 var expV = currentNB + "-" + currentPage
@@ -419,7 +518,7 @@ var navBarSearch = function($scope, $location){
                   return
                 }
 //                $location.path('/register/' + expV);
-                window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + expV)
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/register/" + expV)
                 break;
               case 'editReaction':
                 var expV = currentNB + "-" + currentPage
@@ -625,6 +724,7 @@ var navBarView = function($scope, $param, $location){
             alert('Attempting search on: "' + $scope.search.terms + '"');
           }; // searchfn
 
+          var tmp = window.location.pathname.split("/");
           $scope.navfn = function(action){
             switch(action){
               case 'item.one':
@@ -640,8 +740,8 @@ var navBarView = function($scope, $param, $location){
                 break;
               case 'UpdateReaction':
                 var expV = $scope.form.input.notebook + "-" + $scope.form.input.experiment
-                $location.path('/register/' + expV);
-//                window.open(window.location.origin +"/chembookAng/app/index.html#/register/" + expV)
+//                $location.path('/register/' + expV);
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/register/" + expV)
                 break;
               default:
                 $scope.item = 'Default selection.';
@@ -665,7 +765,115 @@ var tabsSearch = function($scope, $window){
   return $scope
 }
 
+var graphChart = function ($scope,$param) {
+  alert($param.id)
 
+  $scope.chartTypes = [
+    {"id": "line", "title": "Line"},
+    {"id": "spline", "title": "Smooth line"},
+    {"id": "area", "title": "Area"},
+    {"id": "areaspline", "title": "Smooth area"},
+    {"id": "column", "title": "Column"},
+    {"id": "bar", "title": "Bar"},
+    {"id": "pie", "title": "Pie"},
+    {"id": "scatter", "title": "Scatter"}
+  ];
+
+  $scope.dashStyles = [
+    {"id": "Solid", "title": "Solid"},
+    {"id": "ShortDash", "title": "ShortDash"},
+    {"id": "ShortDot", "title": "ShortDot"},
+    {"id": "ShortDashDot", "title": "ShortDashDot"},
+    {"id": "ShortDashDotDot", "title": "ShortDashDotDot"},
+    {"id": "Dot", "title": "Dot"},
+    {"id": "Dash", "title": "Dash"},
+    {"id": "LongDash", "title": "LongDash"},
+    {"id": "DashDot", "title": "DashDot"},
+    {"id": "LongDashDot", "title": "LongDashDot"},
+    {"id": "LongDashDotDot", "title": "LongDashDotDot"}
+  ];
+
+  $scope.chartSeries = [
+    {"name": "Some data", "data": [1, 2, 4, 7, 3]},
+    {"name": "Some data 3", "data": [3, 1, null, 5, 2], connectNulls: true},
+    {"name": "Some data 2", "data": [5, 2, 2, 3, 5], type: "column"},
+    {"name": "My Super Column", "data": [1, 1, 2, 3, 2], type: "column"}
+  ];
+
+  $scope.chartStack = [
+    {"id": '', "title": "No"},
+    {"id": "normal", "title": "Normal"},
+    {"id": "percent", "title": "Percent"}
+  ];
+
+  $scope.addPoints = function () {
+    var seriesArray = $scope.chartConfig.series;
+    var rndIdx = Math.floor(Math.random() * seriesArray.length);
+    seriesArray[rndIdx].data = seriesArray[rndIdx].data.concat([1, 10, 20])
+  };
+
+  $scope.addSeries = function () {
+    var rnd = []
+    for (var i = 0; i < 10; i++) {
+      rnd.push(Math.floor(Math.random() * 20) + 1)
+    }
+    $scope.chartConfig.series.push({
+      data: rnd
+    })
+  }
+
+  $scope.removeRandomSeries = function () {
+    var seriesArray = $scope.chartConfig.series;
+    var rndIdx = Math.floor(Math.random() * seriesArray.length);
+    seriesArray.splice(rndIdx, 1)
+  }
+
+  $scope.removeSeries = function (id) {
+    var seriesArray = $scope.chartConfig.series;
+    seriesArray.splice(id, 1)
+  }
+
+  $scope.toggleHighCharts = function () {
+    this.chartConfig.useHighStocks = !this.chartConfig.useHighStocks
+  }
+
+  $scope.replaceAllSeries = function () {
+    var data = [
+      { name: "first", data: [10] },
+      { name: "second", data: [3] },
+      { name: "third", data: [13] }
+    ];
+    $scope.chartConfig.series = data;
+  };
+
+  $scope.chartConfig = {
+    options: {
+      chart: {
+        type: 'areaspline'
+      },
+      plotOptions: {
+        series: {
+          stacking: ''
+        }
+      }
+    },
+    series: $scope.chartSeries,
+    title: {
+      text: 'Hello'
+    },
+    credits: {
+      enabled: true
+    },
+    loading: false,
+    size: {}
+  }
+
+  $scope.reflow = function () {
+    $scope.$broadcast('highchartsng.reflow');
+  };
+
+
+};
 
 
 
