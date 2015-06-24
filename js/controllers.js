@@ -2,6 +2,22 @@
 /* Controllers */
 
 var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'angularTreeview', 'angAccordion', 'highcharts-ng'])
+.controller('loginCtrl',['$scope','$routeParams','$http','$location', '$cookies', function($scope, $param ,$http, $location, $cookies) {
+        $scope = navBarLogin($scope,$param, $location)   
+        $scope.login = function () {
+            var ok = checkUserPwd($scope.username, $scope.password);
+            if(ok=="\"User or password error\""){
+                $cookies.userChembook = 'Please Login'
+                alert(ok)
+            }
+            else {
+                $cookies.userChembook = $scope.username;
+                alert($scope.username + " is logged in")
+                $location.path('/search');                
+            }
+        };
+      }
+    ])
 .controller('graphCtrl', ['$routeParams','$scope', '$http', '$window', '$location', function($param, $scope,$http, $window, $location) {        
   $scope = treeview($scope,$http,null,$location)  
 //        $scope = formView($scope,$http)  
@@ -18,11 +34,12 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
   });
   $scope = graphChart($scope, $param)
  }])
-.controller('searchCtrl', ['$scope', '$http', '$window', '$location', function($scope,$http, $window, $location) {        
+.controller('searchCtrl', ['$scope', '$http', '$window', '$location', '$cookies', function($scope,$http, $window, $location, $cookies) {  
+        var user = $cookies.userChembook
         $scope = treeview($scope,$http,null,$location)  
 //        $scope = formView($scope,$http)  
         $scope = tabsSearch($scope, $window)
-        $scope = navBarSearch($scope, $location)        
+        $scope = navBarSearch($scope, $location, user)        
         $scope.$on("editReactionEvent", function (event, args) {
 //          $('#containerReaction').hide()
 //          $('#ketcherFrame').show();
@@ -43,19 +60,17 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
         });
 
      }])
-.controller('viewCtrl',['$scope','$routeParams','$http','$location', function($scope, $param ,$http, $location) {
+.controller('viewCtrl',['$scope','$routeParams','$http','$location', '$cookies', function($scope, $param ,$http, $location, $cookies) {
+        var user = $cookies.userChembook
         var form ={input: {}}
 
         $scope = treeview($scope,$http,$param,$location)  
-        $scope = navBarView($scope,$param, $location)     
+        $scope = navBarView($scope,$param, $location, user)     
         $scope.$on("openExperiment", function (event, args) {
-            var jqxhr = $.get( "example.php", function() {
-              alert( "success" );
-            })
-              .always(function() {
-                  var tmp = args.value.split("-");
-                  $scope.form = getExperiment(tmp[0],tmp[1], form);
-              });            
+          var tmp = args.value.split("-");
+          $scope.form = getExperiment(tmp[0],tmp[1], form);
+          $('#containerProcedure').show();
+          $( "div[ng-controller='ckeCtrl']" ).hide()
         });        
         
         $scope.save = function () {
@@ -73,55 +88,28 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
                 value: tmp[0] + "-" + tmp[1]
             });
         }            
-
-/*
-        $http.get("simple.json").then(function(res){
-          if($param.experiment.length >1){
-            var tmp = $param.experiment.split("-");
-            $scope.form = getExperiment(tmp[0],tmp[1], form);
-          }            
-        });
-*/
-
       }
     ])
-.controller('registerCtrl', ['$scope', '$routeParams', '$http', '$location','inform', function($scope, $param ,$http, $location, inform) {        
+.controller('registerCtrl', ['$scope', '$routeParams', '$http', '$location','inform', '$cookies', 'ngDialog', function($scope, $param ,$http, $location, inform, $cookies, ngDialog) {  
+        var user = $cookies.userChembook
         $scope = treeview($scope,$http, $param,$location)  
-        $scope = navBarRegister($scope, $location)             
+        $scope = navBarRegister($scope, $location, user)             
         var form ={input: {}}
         $scope.form =form
+        var jqxhr = $.get( "example.php", function() {
+          alert( "success" );
+        })
+          .always(function() {
+              $scope.isReady = true;
+        });            
+        
         $scope.$on("openExperiment", function (event, args) {
-            var jqxhr = $.get( "example.php", function() {
-              alert( "success" );
-            })
-              .always(function() {
-                  var tmp = args.value.split("-");
-                  $scope.form = getExperiment(tmp[0],tmp[1], form);
-                  
-                /*CKEDITOR*/
-                    $scope.editorOptions = {
-                        language: 'en'
-                       // uiColor: '#000000'
-                    };
-/*
-                    $scope.$on("ckeditor.ready", function( event ) {
-                        $scope.isReady = true;
-                    });
-*/
-                    $scope.test = exp.GeneralDataReaction[0].procedure;
-                    $scope.save = function() {
-                        $http.post('/examples/test.php', {
-                            content: $scope.test
-                        }).success(function() {
-                            alert('Saved');
-                        });
-                    }
-                    $scope.save = function() {
-                        console.info($scope.test, 'save');
-                    }
-                  $scope.isReady = true;
-              });            
+          var tmp = args.value.split("-");
+          $scope.form = getExperiment(tmp[0],tmp[1], form);
+          $('#containerProcedure').show();
+          $( "div[ng-controller='ckeCtrl']" ).hide()
         });        
+
         $scope.$watch('form.input', 
         function() { 
           if(exp != undefined){
@@ -170,6 +158,35 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
           if($scope.form.ctrl != undefined){$scope.form.ctrl.$setPristine(true);}
 //          inform.add('Form data saved');
         });
+        $scope.$on("setMoleculesEvent", function (event, args) {
+          var ketcher = getKetcher();
+          exp.Rxn = ketcher.getMolfile();
+          loadStoic(exp.Rxn, "", "mole")
+          if($scope.form.ctrl != undefined){$scope.form.ctrl.$setPristine(false);}
+        });
+        $scope.$on("findAllEvent", function (event, args) {
+          FindAll(ngDialog)
+        });
+        $scope.$on("addFromCTEvent", function (event, args) {
+          addFromCT(ngDialog)
+        });
+/*
+        $scope.$on("addProCTEvent", function (event, args) {
+          addProCT(ngDialog)
+        });
+*/
+        $scope.$on("addFromBottEvent", function (event, args) {
+          addFromBottle(ngDialog)
+        });
+/*
+        $scope.$on("addProBottEvent", function (event, args) {
+          addProBott(ngDialog)
+        });
+        $scope.$on("addSolventEvent", function (event, args) {
+          addSolvent(ngDialog)
+        });
+*/
+  
         if($param.experiment.length >1){
             var tmp = $param.experiment.split("-");
             $scope.$root.$broadcast("openExperiment", {                                      
@@ -178,6 +195,95 @@ var xControllers = angular.module('xControllers', ['ui.layout', 'ngSanitize', 'a
         }            
     
 }])
+.controller('addFromChemtoolCtrl', function ($scope, ngDialog) {
+  $scope.searchCT = function(){
+            searchCT();
+          }; // searchfn
+  $scope.addAsReagent = function(){
+            addToReaction('CT','reag');
+          }; // searchfn
+  $scope.addAsProduct = function(){
+            addToReaction('CT','prod');
+          }; // searchfn
+})
+.controller('addFromBottleCtrl', function ($scope, ngDialog) {
+  $scope.searchBottle = function(){
+            searchCT();
+          }; // searchfn
+  $scope.addAsReagent = function(){
+            addToReaction('Bottle','reag');
+          }; // searchfn
+  $scope.addAsProduct = function(){
+            addToReaction('Bottle','prod');
+          }; // searchfn
+  $scope.addAsSolvent = function(){
+            addToReaction('Bottle','solvent');
+          }; // searchfn
+  
+})
+.controller('FirstDialogCtrl', function ($scope, ngDialog) {
+    $scope.addtopro = function(){
+                var id = $("#myGrid").jqGrid('getGridParam', 'selrow');
+                var name = $("#myGrid").jqGrid('getCell', id, 'name');
+                var form = $("#myGrid").jqGrid('getCell', id, 'formulation');
+                if (id == undefined) {
+                    alert('Select a Formulation')
+                    return
+                }
+                var idForm = $("#myGridForm").jqGrid('getGridParam', 'selrow');
+                var idBottle = $("#myGridForm").jqGrid('getCell', idForm, 'bottle_id');
+                var density = $("#myGridForm").jqGrid('getCell', idForm, 'density');
+                var purity = $("#myGridForm").jqGrid('getCell', idForm, 'purity');
+                var loc1 = $("#myGridForm").jqGrid('getCell', idForm, 'storage_location');
+                var loc2 = $("#myGridForm").jqGrid('getCell', idForm, 'strorage_sublocation');
+                var risk = $("#myGridForm").jqGrid('getCell', idForm, 'risk_codes');
+                var risk1 = $("#myGridForm").jqGrid('getCell', idForm, 'risk_symbols');
+                var risk2 = $("#myGridForm").jqGrid('getCell', idForm, 'safety_codes');
+                if (idForm == undefined) {
+                    alert('Select a Botlle')
+                    return
+                }
+
+                var toAdd = "<p>Id:" + id + "<br> Name: " + name + "<br> Formulation: " + form + "<br></p>";
+                toAdd = toAdd + "<p>IdBottle:" + idBottle + "<br> Density: " + density + "<br> Purity: " + purity + "<br> Location: " + loc1 + "-" + loc2 + "<br></p>";
+                toAdd = toAdd + "<p>Risk Codes:" + risk + "<br> Risk Symbols: " + risk1 + "<br> Safety Codes: " + risk2 + "<br></p>";
+                $scope.$root.$broadcast("addProcedure", {                                      
+                    value: toAdd
+                });
+
+    }
+/*
+    $scope.next = function () {
+        ngDialog.close('ngdialog1');
+        ngDialog.open({
+            template: 'secondDialog',
+            className: 'ngdialog-theme-flat ngdialog-theme-custom'
+        });
+    };
+*/
+})
+.controller('ckeCtrl', ['$scope', function($scope) {        
+  $scope.htmlEditor = ""
+  $scope.$on("openProcedure", function (event, args) {
+    $('#containerProcedure').hide();
+    $( "div[ng-controller='ckeCtrl']" ).show()
+
+    $scope.htmlEditor = exp.WorkUp
+  });
+  $scope.$on("addProcedure", function (event, args) {
+    $('#containerProcedure').hide();
+    $( "div[ng-controller='ckeCtrl']" ).show()
+    if (exp != undefined) {
+      exp.isProcedureChanged = true;
+      exp.WorkUp = args.value + exp.WorkUp;
+      $scope.htmlEditor = exp.WorkUp
+    }
+    else {
+      $scope.htmlEditor =args.value
+    }
+
+  });
+}]);  
 
 var treeview = function($scope,$http,$param,$location) {
         /* treeview section*/
@@ -352,14 +458,56 @@ var treeview = function($scope,$http,$param,$location) {
   return $scope
 }
 
-var navBarSearch = function($scope, $location){
+var navBarLogin = function($scope, $location){
+      /* navBar section*/
+          $scope.affixed = 'top';
+          $scope.brand = "<span class='glyphicon glyphicon-user'></span> Please Login";
+          $scope.inverse = true;
+          $scope.menus = [
+            {
+              title : "Move to",
+              menu : [
+                {
+                  title : "Register",
+                  action : "item.one"
+                },
+                {
+                  title : "View",
+                  action : "item.two"
+                }
+              ]
+            }
+          ]; // end menus
+
+          $scope.item = '';
+          $scope.styling = 'Inverse';
+          $scope.searchDisplay = 'Visible';true
+
+          var tmp = window.location.pathname.split("/");
+          $scope.navfn = function(action){
+            switch(action){
+              case 'item.one':
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/register/1", "_blank");
+                break;
+              case 'item.two':
+                window.open(serverWeb + "/" + tmp[1] + "/index.html#/view/1", "_blank");
+                break;
+              default:
+                $scope.item = 'Default selection.';
+                break;
+            }; // end switch
+          }; // end navfn
+  return $scope
+}
+
+var navBarSearch = function($scope, $location, user){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
             show : true,
             terms : ''
           };
-          $scope.brand = "<span class='glyphicon glyphicon-user'></span> Ugo";
+          $scope.brand = "<span class='glyphicon glyphicon-user'></span> " + user;
           $scope.inverse = true;
           $scope.menus = [
             {
@@ -576,14 +724,14 @@ var navBarSearch = function($scope, $location){
   return $scope
 }
 
-var navBarRegister = function($scope, $location){
+var navBarRegister = function($scope, $location, user){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
             show : true,
             terms : ''
           };
-          $scope.brand = "<span class='glyphicon glyphicon-list-alt'></span> Reactions";
+          $scope.brand = "<span class='glyphicon glyphicon-user'></span> " + user;
           $scope.inverse = true;
           $scope.menus = [
             {
@@ -614,7 +762,7 @@ var navBarRegister = function($scope, $location){
                   action : "regdetail"
                 },
                 {
-                  title : "Reaction",
+                  title : "Reaction Scheme",
                   action : "regSchema"
                 },
                 {
@@ -626,11 +774,53 @@ var navBarRegister = function($scope, $location){
                   action : "regProc"
                 }
               ]
-            },                            
+            },
             {
-              title : "Edit Reaction",
-              action : "editReaction"
-            }
+              title : "Reaction",
+              menu : [
+                {
+                  title : "Create New Page",
+                  action : "newPage"
+                },
+                {
+                  title : "Clear Page",
+                  action : "clearPage"
+                },
+                {
+                  title : "Copy Page",
+                  action : "copyPage"
+                },
+                {
+                  title : "Edit Scheme",
+                  action : "editReaction"
+                },
+                {
+                  title : "Edit Procedure",
+                  action : "editProcedure"
+                },
+                {
+                  title : "Set Molecules",
+                  action : "setMolecules"
+                },
+                {
+                  title : "Find All",
+                  action : "findAll"
+                }
+              ]
+            },            
+            {
+              title : "Add to Reaction",
+              menu : [
+                {
+                  title : "From Chemtools",
+                  action : "addFromCT"
+                },
+                {
+                  title : "From Bottle",
+                  action : "addFromBott"
+                }
+              ]
+            },            
           ]; // end menus
 
           $scope.item = '';
@@ -645,13 +835,7 @@ var navBarRegister = function($scope, $location){
             switch(action){
               case 'item.one':
                 $location.path('/search');
-                
-                //window.open(window.location.origin +"/chembookAng/app/index.html#/search", "_self");
-                break;                $scope.item = 'Item three selected.';
-                var el = document.getElementById('form1');
-                var scopeForm1 = angular.element(el).scope();
-                scopeForm1.submitForm(scopeForm1.ngform,scopeForm1.model);
-
+                break;                
               case 'item.two':
                 $location.path('/view/1');
                 break;
@@ -672,22 +856,48 @@ var navBarRegister = function($scope, $location){
                     value: ""
                 });
                 break;
+              case 'setMolecules':
+                $scope.$root.$broadcast("setMoleculesEvent", {                                      
+                    value: ""
+                });
+                break;
+              case 'findAll':
+                $scope.$root.$broadcast("findAllEvent", {                                      
+                    value: ""
+                });
+                break;
+              case 'addFromCT':
+                $scope.$root.$broadcast("addFromCTEvent", {                                      
+                    value: ""
+                });
+                break;
+              case 'addFromBott':
+                $scope.$root.$broadcast("addFromBottEvent", {                                      
+                    value: ""
+                });
+                break;
+              case 'editProcedure':
+                $scope.$root.$broadcast("openProcedure", {                                      
+                    value: "ciao ugo"
+                });
+                break;
               default:
                 $scope.item = 'Default selection.';
+                    alert("Working in progress")
                 break;
             }; // end switch
           }; // end navfn
-return $scope
+    return $scope
 }
 
-var navBarView = function($scope, $param, $location){
+var navBarView = function($scope, $param, $location, user){
       /* navBar section*/
           $scope.affixed = 'top';
           $scope.search = {
             show : false,
             terms : ''
           };
-          $scope.brand = "<span class='glyphicon glyphicon-list-alt'></span> Reactions";
+          $scope.brand = "<span class='glyphicon glyphicon-user'></span>  " + user;
           $scope.inverse = true;
           $scope.menus = [
             {

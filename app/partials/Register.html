@@ -1,4 +1,145 @@
-     <div class = "layout" ui-layout  >
+		<script type="text/ng-template" id="firstDialog">
+          <div id="resizeMolC" class="ui-widget-content resizeMol" align="center" >                                     
+              <div id='viewMol' >
+              </div>                                             
+          </div> 
+          <table id='myGrid'></table>
+          <div id="gridpager" ></div>
+          <table id='myGridForm'></table>
+          <div id="gridpagerform" ></div>
+          <button ng-click="addtopro()" type="submit" class="btn btn-danger">Add to Procedure</button>
+          
+		</script>
+		<script type="text/ng-template" id="addFromChemtoolDialog">
+          <div class="page-header">
+              <h1>Add From Chemtools <small> to Reaction</small></h1>
+          </div>
+          <form>
+          <fieldset>
+          <table>
+              <tr>
+                  <td>
+                    <select>
+                      <option value="batch">Batch</option>
+                      <option value="corpid">CorpId</option>
+                    </select>
+                  </td>
+                  <td>                    
+                      <input type="text" id="txtLabels" class ="viewTxt" placeholder = "Insert Value" style="width: 150px"/>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                    <button ng-click="searchCT()" type="submit" class="btn btn-danger">Search</button>
+                  </td>
+                  <td>
+                      <!--<input id="butPrintReport" type="button" class="buttonsTwL" onclick="printReport()" style="width: 150px;"/>-->
+
+                  </td>
+              </tr>
+          </table>
+              <div id="batchData">
+                  <table>
+                      <tr>
+                          <td>
+                              <div id="resizeMolB" class="ui-widget-content resizeMol" style="float:left; width:200px; height:150px; padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px">                                     
+                                  <div id="batch">
+                                  </div>                                 
+                              </div>  
+                              <div id="data" style="padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px">
+                                  <input type="text" id="labelmw" class ="viewLabel" style="width: 140px" disabled="disabled" value="Molecular Weigth"/>
+                                  <input type="text" id="batchMW" class ="viewTxt" style="width: 140px"/>
+                                  <br />
+                                  <input type="text" id="labelmf" class ="viewLabel" style="width: 140px" disabled="disabled" value="Molecular Formula"/>
+                                  <input type="text" id="batchMF" class ="viewTxt" style="width: 140px"/>
+                                  <br />
+                                  <input type="text" id="labelMol" class ="viewLabel" style="width: 140px" disabled="disabled" value="Molfile"/>
+                                  <textarea id="molfile" cols="20" rows="2"></textarea>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>
+                              <table id='myGridFormFind'></table>
+                              <div id="gridpagerformfind" ></div>
+                          </td>
+                      </tr>
+                  </table>
+
+              </div>
+
+          </fieldset>
+            <button ng-click="addAsReagent()" type="submit" class="btn btn-danger">Add to Reaction as Reagent</button>
+            <button ng-click="addAsProduct()" type="submit" class="btn btn-danger">Add to Reaction as Product</button>
+          </form>
+		</script>
+		<script type="text/ng-template" id="addFromBottleDialog">
+          <div class="page-header">
+              <h1>Add From Botlle <small> to Reaction</small></h1>
+          </div>
+          <form>
+          <fieldset>
+          <table>
+              <tr>
+                  <td>
+                    <select>
+                      <option value="strid">StrId</option>
+                      <option value="bottleid">BottleId</option>
+                      <option value="cas">CAS</option>
+                    </select>
+                  </td>
+                  <td>                    
+                      <input type="text" id="txtLabels" class ="viewTxt" placeholder = "Insert Value" style="width: 150px"/>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      <input id="butPrint"  type="button" class="buttonsTwL" onclick="searchCT()" style="width: 150px" value="Search"/>                
+                  </td>
+                  <td>
+                      <!--<input id="butPrintReport" type="button" class="buttonsTwL" onclick="printReport()" style="width: 150px;"/>-->
+
+                  </td>
+              </tr>
+          </table>
+              <div id="batchData">
+                  <table>
+                      <tr>
+                          <td>
+                              <div id="resizeMolB" class="ui-widget-content resizeMol" style="float:left; width:200px; height:150px; padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px">                                     
+                                  <div id="batch">
+                                  </div>                                 
+                              </div>  
+                              <div id="data" style="padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px">
+                                  <input type="text" id="labelmw" class ="viewLabel" style="width: 140px" disabled="disabled" value="Molecular Weigth"/>
+                                  <input type="text" id="batchMW" class ="viewTxt" style="width: 140px"/>
+                                  <br />
+                                  <input type="text" id="labelmf" class ="viewLabel" style="width: 140px" disabled="disabled" value="Molecular Formula"/>
+                                  <input type="text" id="batchMF" class ="viewTxt" style="width: 140px"/>
+                                  <br />
+                                  <input type="text" id="labelMol" class ="viewLabel" style="width: 140px" disabled="disabled" value="Molfile"/>
+                                  <textarea id="molfile" cols="20" rows="2"></textarea>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>
+                              <table id='myGridFormFind'></table>
+                              <div id="gridpagerformfind" ></div>
+                          </td>
+                      </tr>
+                  </table>
+
+              </div>
+
+          </fieldset>
+            <button ng-click="addAsReagent()" type="submit" class="btn btn-danger">Add to Reaction as Reagent</button>
+            <button ng-click="addAsProduct()" type="submit" class="btn btn-danger">Add to Reaction as Product</button>
+            <button ng-click="addAsSolvent()" type="submit" class="btn btn-danger">Add to Reaction as Solvent</button>
+          </form>
+		</script>
+
+  <div class = "layout" ui-layout  >
       <div id="nord" ui-layout-container size="50px" class=" html-back" >
             <div class = "navbarfloat" >
                 <angled-navbar1 affixed='affixed' brand='brand' inverse='inverse' menus='menus' navfn='navfn(action)' searchfn='searchfn()'></angled-navbar1>
@@ -102,8 +243,8 @@
               </tr>
               <tr>
                 <td>
-                  <div style="height: 500px; width: 100%; margin: 0;">
-                      <ang-accordion>
+                  <div >
+                      <ang-accordion >
                             <collapsible-item title="Reaction Scheme">
                               <div id="containerReaction" style="min-width:800px;min-height:200px;width:100%;;border-style:none">
                                 
@@ -133,10 +274,13 @@
                                     </tr>
                                 </table>                                
                             </collapsible-item>
-                            <collapsible-item title="Reaction & Workup Procedure">
-                                <div ng-cloak ng-show="isReady">
-                                    <textarea ckeditor="editorOptions" name="editor" ng-model="test" ng-change="save()"></textarea>
+                            <collapsible-item title="Procedure">
+                                <div id="containerProcedure" style="min-width:800px;min-height:200px;width:100%;;border-style:none" disabled>                                
                                 </div>
+                              <div ng-controller="ckeCtrl">
+                                        <ng-ckeditor bind="htmlEditor" skin="moono" remove-buttons="Image" remove-plugins="iframe,flash,smiley" msn-count="
+                                  Number of typed characters:"></ng-ckeditor>
+                              </div>                            
                             </collapsible-item>
                             <collapsible-item title="Attachments">
                                 <div>

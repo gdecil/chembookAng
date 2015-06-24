@@ -351,15 +351,15 @@ function cgReactionsData(mydata) {
         autowidth: true,
         colNames: ['ID', 'FORMULATION_ID', 'DATABASE', 'NAME', 'USERNAME', 'DATE', 'LOCATION', 'FORMULATION', 'DENSITY'],
         colModel: [
-            { name: 'ID', index: 'ID', width: 60, hidden: false, key: true },
-            { name: 'FORMULATION_ID', index: 'FORMULATION_ID', width: 60, hidden: true },
-            { name: 'DATABASE', index: 'DATABASE', width: 60 },
-            { name: 'NAME', index: 'NAME', width: 150 },
-            { name: 'RESP', index: 'RESP', width: 120 },
-            { name: 'SUBMISSION_DATE', index: 'SUBMISSION_DATE', width: 160, formatter: 'date', formatoptions: { newformat: 'm/d/Y' }, hidden: true },
-            { name: 'LOCATION', index: 'LOCATION', width: 60, hidden: true },
-            { name: 'FORMULATION', index: 'FORMULATION', width: 200 },
-            { name: 'DENSITY', index: 'DENSITY', width: 50 }
+            { name: 'id', index: 'id', width: 60, hidden: false, key: true },
+            { name: 'formulation_id', index: 'formulation_id', width: 60, hidden: true },
+            { name: 'database', index: 'database', width: 60 },
+            { name: 'name', index: 'name', width: 150 },
+            { name: 'resp', index: 'resp', width: 120 },
+            { name: 'submission_date', index: 'submission_date', width: 160, formatter: 'date', formatoptions: { newformat: 'm/d/Y' }, hidden: true },
+            { name: 'location', index: 'LOCATION', width: 60, hidden: true },
+            { name: 'formulation', index: 'formulation', width: 200 },
+            { name: 'density', index: 'density', width: 50 }
         ],
         caption: "All Databases Info",
         pager: '#gridpager',
@@ -373,8 +373,8 @@ function cgReactionsData(mydata) {
 
             $('.jqgrow').click(function(e) {
                 var rowId = $(this).attr('ID');
-                var Id = $("#myGrid").jqGrid('getCell', rowId, 'ID');
-                var db = $("#myGrid").jqGrid('getCell', rowId, 'DATABASE');
+                var Id = $("#myGrid").jqGrid('getCell', rowId, 'id');
+                var db = $("#myGrid").jqGrid('getCell', rowId, 'database');
                 //$("#dialog-View").dialog("open");
                 //$("#dialog-View").dialog({ title: db });
 
@@ -384,7 +384,7 @@ function cgReactionsData(mydata) {
 
                 if (db == "Chemtools") {
                     $("#selectedMol").remove();
-                    var mol = $("#myGrid").jqGrid('getCell', rowId, 'NAME');
+                    var mol = $("#myGrid").jqGrid('getCell', rowId, 'name');
                     appendMolecule('#viewMol', mol, db,'Batch');
                 } 
                 else if (db == "Bottles") {
@@ -392,13 +392,13 @@ function cgReactionsData(mydata) {
                     appendMolecule('#viewMol', mol, 'bottle', 'StrId');
 
                     $("#selectedMol").remove();
-                    var name = $("#myGrid").jqGrid('getCell', rowId, 'NAME');
-                    var form = $("#myGrid").jqGrid('getCell', rowId, 'FORMULATION');
-                    var formId = $("#myGrid").jqGrid('getCell', rowId, 'FORMULATION_ID');
+                    var name = $("#myGrid").jqGrid('getCell', rowId, 'name');
+                    var form = $("#myGrid").jqGrid('getCell', rowId, 'formulation');
+                    var formId = $("#myGrid").jqGrid('getCell', rowId, 'formulation_id');
                     $("[aria-describedby='dialog-Find'] .ui-dialog-buttonpane").before("<div id='selectedMol'><p>Selected: " + name + " Formulation:" + form + "</p></div>");
                     var data = getFormulationData(formId)
                     
-                    cgFormulationData($.parseJSON(data));
+                    cgFormulationData(data);
 
                 }
                 else {
@@ -406,7 +406,7 @@ function cgReactionsData(mydata) {
                     $('#viewMol').html("")
                     appendReaction('#viewMol', Id);
                 }
-                var NAME = $("#myGrid").jqGrid('getCell', rowId, 'NAME');
+                var NAME = $("#myGrid").jqGrid('getCell', rowId, 'name');
                 $('#viewMol').append(NAME);
 
                 //alert(db + ' You rolled over ' + rowId);
@@ -445,19 +445,19 @@ function cgFormulationData(mydata) {
         autowidth: true,
         colNames: ['FORMULATION_ID', 'BOTTLE_ID', 'RISK_CODES', 'RISK_SYMBOLS', 'SAFETY_CODES', 'DENSITY', 'PURITY', 'CURRENT_OWNER', 'STORAGE_LOCATION', 'STORAGE_SUBLOCATION', 'FORMULATION_NAME', 'LAST_WEIGH', 'UNIT'],
         colModel: [
-            { name: 'FORMULATION_ID', index: 'FORMULATION_ID', width: 60, hidden: true },
-            { name: 'BOTTLE_ID', index: 'BOTTLE_ID', width: 60, key: true },
-            { name: 'RISK_CODES', index: 'RISK_CODES', width: 150 },
-            { name: 'RISK_SYMBOLS', index: 'RISK_SYMBOLS', width: 120 },
-            { name: 'SAFETY_CODES', index: 'SAFETY_CODES', width: 160 },
-            { name: 'DENSITY', index: 'DENSITY', width: 60 },
-            { name: 'PURITY', index: 'PURITY', width: 60 },
-            { name: 'CURRENT_OWNER', index: 'CURRENT_OWNER', width: 200 },
-            { name: 'STORAGE_LOCATION', index: 'STORAGE_LOCATION', width: 50 },
-            { name: 'STORAGE_SUBLOCATION', index: 'STORAGE_SUBLOCATION', width: 200 },
-            { name: 'FORMULATION_NAME', index: 'FORMULATION_NAME', width: 200 },
-            { name: 'LAST_WEIGH', index: 'LAST_WEIGH', width: 200 },
-            { name: 'UNIT', index: 'UNIT', width: 50 }
+            { name: 'formulation_id', index: 'formulation_id', width: 60, hidden: true },
+            { name: 'bottle_id', index: 'bottle_id', width: 60, key: true },
+            { name: 'risk_codes', index: 'risk_codes', width: 150 },
+            { name: 'risk_symbols', index: 'risk_symbols', width: 120 },
+            { name: 'safety_codes', index: 'safety_codes', width: 160 },
+            { name: 'density', index: 'density', width: 60 },
+            { name: 'purity', index: 'purity', width: 60 },
+            { name: 'current_owner', index: 'current_owner', width: 200 },
+            { name: 'storage_location', index: 'storage_location', width: 50 },
+            { name: 'storage_sublocation', index: 'storage_sublocation', width: 200 },
+            { name: 'formulation_name', index: 'formulation_name', width: 200 },
+            { name: 'last_weigh', index: 'last_weigh', width: 200 },
+            { name: 'unit', index: 'unit', width: 50 }
         ],
         caption: "All Formulations Info",
         pager: '#gridpagerform',
@@ -482,18 +482,17 @@ function cgFormulations(mydata) {
         data: mydata,
         height: 'auto',
         autowidth: true,
-        colNames: ['FORMULATION_ID', '  STRUCTURE_ID', 'RISK_CODES', 'RISK_SYMBOLS', 'SAFETY_CODES', 'DENSITY', 'PURITY', 'FORMULATION_NAME', 'SIGMA', 'CAS-NUMBER'],
+        colNames: ['FORMULATION_ID', '  STRUCTURE_ID', 'RISK_CODES', 'RISK_SYMBOLS', 'SAFETY_CODES', 'DENSITY', 'PURITY', 'FORMULATION_NAME', 'CAS-NUMBER'],
         colModel: [
-            { name: 'FORMULATION_ID', index: 'FORMULATION_ID', width: 60, hidden: true, key: true },
-            { name: 'STRUCTURE_ID', index: 'STRUCTURE_ID', width: 60 },
-            { name: 'RISK_CODES', index: 'RISK_CODES', width: 150 },
-            { name: 'RISK_SYMBOLS', index: 'RISK_SYMBOLS', width: 120 },
-            { name: 'SAFETY_CODES', index: 'SAFETY_CODES', width: 160 },
-            { name: 'DENSITY', index: 'DENSITY', width: 60 },
-            { name: 'PURITY', index: 'PURITY', width: 60 },
-            { name: 'FORMULATION_NAME', index: 'FORMULATION_NAME', width: 200 },
-            { name: 'SIGMA', index: 'SIGMA', width: 50 },
-            { name: 'CAS_NUMBER', index: 'CAS_NUMBER', width: 50 }
+            { name: 'formulation_id', index: 'formulation_id', width: 60, hidden: true,key: true },
+            { name: 'structure_id', index: 'structure_id', width: 60 },
+            { name: 'risk_codes', index: 'risk_codes', width: 150 },
+            { name: 'risk_symbols', index: 'risk_symbols', width: 120 },
+            { name: 'safety_codes', index: 'safety_codes', width: 160 },
+            { name: 'density', index: 'density', width: 60 },
+            { name: 'purity', index: 'purity', width: 60 },
+            { name: 'formulation_name', index: 'formulation_name', width: 200 },
+            { name: 'cas_number', index: 'cas_number', width: 150 }
         ],
         caption: "All Formulations Info",
         pager: '#gridpagerformfind',

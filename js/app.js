@@ -51,7 +51,9 @@ var xApp = angular.module(
     'schemaForm',
     'ui.ace',
     'ui.bootstrap',
-    'ngCkeditor'
+    'ng.ckeditor',
+    'ngCookies',
+    'ngDialog'
   ]
 );
 
@@ -61,6 +63,10 @@ xApp.config(['$routeProvider',
       when('/graph/:id', {
         templateUrl: 'app/partials/Graph.html',
         controller: 'graphCtrl'
+      }).
+      when('/login', {
+        templateUrl: 'app/partials/Login.html',
+        controller: 'loginCtrl'
       }).
       when('/search', {
         templateUrl: 'app/partials/Search.html',
@@ -75,7 +81,7 @@ xApp.config(['$routeProvider',
         controller: 'registerCtrl'
       }).
       otherwise({
-        redirectTo: '/search'
+        redirectTo: '/login'
       });
   }]);
 

@@ -1,3 +1,217 @@
+function getCorpId(corpid) {
+
+    var dataX = '{"corpid":"' + corpid + '"}';
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Chemlink/getCorpId",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    //return $.parseJSON(ret);
+
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        //return tmp;
+    }
+    else {
+
+        return tmp;
+//        return tmp.d.replace(/'/g, "\\\"");
+    }
+}
+
+function getBatch(batch) {
+
+    var dataX = '{"batch":"' + batch + '"}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Chemlink/getBatch",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    //return $.parseJSON(ret);
+
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        //return tmp;
+    }
+    else {
+
+        return tmp;
+//        return tmp.d.replace(/'/g, "\\\"");
+    }
+}
+
+function getBottle(id, type) {
+    var dataX = '{"id":"' + id + '", "type":"' + type + '"}';
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Chemlink/getBottle",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+        return tmp;
+    }
+}
+
+function getBottleForm(id,type) {
+
+    var dataX = '{"id":"' + id + '", "type":"' + type + '"}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Chemlink/getBottleFormulation",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+        return tmp;
+    }
+}
+
+function getReactionsMolecules(compound) {
+    var dataX = '{"compound":' + JSON.stringify(compound) + '}';
+    var dataX = '{"compound":"' + compound + '"}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Chemlink/GetData",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+
+        return tmp;
+    }
+}
+
+function CreateReaction( rxn,  product,  reagent) {
+    var dataX = '{"rxn":"' + rxn + '","product":"' + product + '","reagent":"' + reagent + '"}'
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Reaction.asmx/CreateReaction",
+        data: dataX, 
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+  return ret;
+//    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+
+        return ret;
+    }
+}
+
+function FromReactionToMolecules(rxn) {
+    var dataX = '{"rxn":"' + rxn + '"}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Reaction.asmx/FromReactionToMolecules",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+
+        return tmp;
+    }
+}
+
+function getProductsIndigo(rxn) {
+    var dataX = '{"rxn":"' + rxn + '"}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Reaction.asmx/GetProductsIndigo",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+
+        return tmp;
+    }
+}
+
+function getReagentsIndigo(rxn) {
+    var dataX = '{"rxn":"' + rxn + '"}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Reaction.asmx/GetReagentsIndigo",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    if (tmp.ExceptionType != undefined) {
+        alert(tmp.Message)
+        return tmp;
+    }
+    else {
+
+        return tmp;
+    }
+}
+
 var getAttFileName = function (attacKey) {
     var dataX = '{"attacKey":"' + attacKey  + '"}';
 
@@ -67,6 +281,19 @@ var getReactions = function (reaction, searchType, reactionId, gridId) {
     request.fail(function( jqXHR, textStatus ) {
       alert( "Request failed: " + textStatus );
     });      
+}
+
+var getReactionsData = function (reaction) {
+    var dataX = '{"reaction":' + JSON.stringify(reaction) + '}';
+
+    return $.ajax({
+        type: "POST",
+        url: server + "/Reaction.asmx/MatchBingoReactionD",
+        data: JSON.stringify(dataX),
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json"
+    });
 }
 
 var getMolecule = function(strid) {
@@ -190,6 +417,79 @@ var getCAS = function (inchi) {
     });      
 }
 
+var getExperiment = function(notebook,page, form){
+  exp = new Experiment(notebook,page);
+  form.input.batch_creator  = exp.GeneralDataReaction[0].batch_creator;  
+  form.input.continued_from_rxn = exp.GeneralDataReaction[0].continued_from_rxn; 
+  form.input.continued_to_rxn = exp.GeneralDataReaction[0].continued_to_rxn;
+  form.input.creation_date = exp.GeneralDataReaction[0].creation_date; 
+  form.input.experiment= exp.GeneralDataReaction[0].experiment;   
+  form.input.notebook= exp.GeneralDataReaction[0].notebook;   
+  form.input.yield = exp.GeneralDataReaction[0].yield;   
+  form.input.title = exp.GeneralDataReaction[0].subject;  
+
+  $('#containerReaction').html("");
+  appendReaction('#containerReaction', exp.GeneralDataReaction[0].rxn_scheme_key) 
+  $('#containerReaction').show();
+  $('#ketcherFrame').hide();
+  
+    var grid = $("#myReactant");
+    grid.jqGrid('GridUnload');
+    var Mydata = exp.getReagents()
+
+    if (Mydata != null) {
+        var gridR = "#myReactant",
+            pagerR = '#reactantspager',
+            captionR = "Reagents";
+        cgProductsReagentsSave(Mydata, gridR, pagerR, captionR);
+    }
+
+    var grid = $("#myProducts");
+    grid.jqGrid('GridUnload');
+    var Mydata = exp.getProducts()
+    if (Mydata != null) {
+        var gridR = "#myProducts",
+            pagerR = '#Productspager',
+            captionR = "Products";
+        cgProductsReagentsSave(Mydata, gridR, pagerR, captionR);
+    }
+
+/*
+    var grid = $("#myAttach");
+    grid.jqGrid('GridUnload');
+    cgAttach($.parseJSON(expCurrent.getAttachement()));
+*/
+
+    
+  $('#containerProcedure').html(exp.GeneralDataReaction[0].procedure);
+    
+  var grid = $("#myAttach");
+  grid.jqGrid('GridUnload');
+  cgAttach(exp.getAttachement());
+
+
+  return form;
+} 
+
+var getExperiment1 = function(notebook,page, model){
+  exp = new Experiment(notebook,page);
+  model.batch_creator  = exp.GeneralDataReaction[0].batch_creator;  
+  model.continued_from_rxn = exp.GeneralDataReaction[0].continued_from_rxn; 
+  model.continued_to_rxn = exp.GeneralDataReaction[0].continued_to_rxn;
+  model.creation_date = exp.GeneralDataReaction[0].creation_date; 
+  model.experiment= exp.GeneralDataReaction[0].experiment;   
+  model.notebook= exp.GeneralDataReaction[0].notebook;   
+  model.yield = exp.GeneralDataReaction[0].yield;   
+  model.title = exp.GeneralDataReaction[0].subject;  
+
+  $('#containerReaction').html("");
+  appendReaction('#containerReaction', exp.GeneralDataReaction[0].rxn_scheme_key) 
+  $('#containerReaction').show();
+  $('#ketcherFrame').hide();
+  
+  return model;
+}
+
 var getFormula = function (inchi) {
     var request = $.ajax({
         type: "GET",
@@ -213,6 +513,49 @@ var getFormula = function (inchi) {
     request.fail(function( jqXHR, textStatus ) {
       alert( "Request failed: " + textStatus );
     });      
+}
+
+function getFormulationData(strId) {
+    var dataX = '{"strId":' + strId + '}';
+
+    var ret = $.ajax({
+        type: "POST",
+        url: server + "/Chemlink/GetFormulationData",
+        data: dataX,
+        contentType: "application/json; charset=utf-8",
+        processData: false,
+        dataType: "json",
+        async: false
+    }).responseText;
+    var tmp = eval('(' + ret + ')');
+    return tmp;
+}
+
+var getObjects = function (obj, key, val) {
+            var objects = [];
+            for (var i in obj) {
+                if (!obj.hasOwnProperty(i)) continue;
+                if (typeof obj[i] == 'object') {
+                    objects = objects.concat(getObjects(obj[i], key, val));
+                } else if (i == key && obj[key] == val) {
+                    objects.push(obj);
+                }
+            }
+            return objects;
+        }
+
+var getKetcher = function (){
+  var frame = null;
+
+  if ('frames' in window && 'ketcherFrame' in window.frames){
+      frame = window.frames['ketcherFrame'];
+  }
+  else {
+      return null;
+  }
+  if ('window' in frame){
+      return frame.window.ketcher;
+		}
 }
 
 var getMW = function (inchi) {

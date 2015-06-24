@@ -125,6 +125,23 @@ Experiment.prototype.getProducts = function () {
     }
 };
 
+/*
+Experiment.prototype.GeneralData = function() {
+    var dataX = JSON.stringify('{"notebook":"' + this.notebook + '","page":"' + this.page + '","enumVal":"' + this.enumVal + '"}');
+                               
+    url = server + "/Reaction.asmx/GetExperiment";
+    return $.ajax(
+      {
+          type: "POST",
+          data: dataX,
+          contentType: "application/json; charset=utf-8",
+          processData: false,
+          dataType: "json",
+          url: url 
+      });
+    }
+*/
+
 Experiment.prototype.GeneralData = function () {
     var dataX = JSON.stringify('{"notebook":"' + this.notebook + '","page":"' + this.page + '","enumVal":"' + this.enumVal + '"}');
     var ret = $.ajax({
